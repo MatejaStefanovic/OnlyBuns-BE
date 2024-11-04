@@ -22,3 +22,49 @@
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
 replay_pid*
+
+# Gradle files
+.gradle/
+build/
+out/
+**/build/
+**/out/
+
+# IntelliJ IDEA files
+.idea/
+*.iml
+*.ipr
+*.iws
+*.class
+
+# Java class files
+*.class
+*.db
+*.log
+
+# Environment settings
+*.env
+*.properties
+*.yaml
+
+# Node.js files
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# React build output
+build/
+dist/
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# IDE files
+*.sublime-project
+*.sublime-workspace
+.vscode/
+
+# Coverage reports
+coverage/
+*.lcov
