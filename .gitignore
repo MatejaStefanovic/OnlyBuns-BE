@@ -44,7 +44,6 @@ out/
 
 # Environment settings
 *.env
-*.properties
 *.yaml
 
 # Node.js files
