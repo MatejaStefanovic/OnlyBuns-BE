@@ -17,7 +17,7 @@ COPY app/src app/src
 RUN chmod +x ./gradlew
 
 # Build the application (optional, you can also skip this step)
-RUN ./gradlew build --no-daemon
+RUN ./gradlew build --no-daemon --refresh-dependencies
 
 # Use a lightweight JDK image for the runtime
 FROM openjdk:17-jdk-slim
