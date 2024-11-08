@@ -20,8 +20,13 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler(InvalidTokenException.class)
-    public ResponseEntity<String> handleEmailAlreadyExistsException(InvalidTokenException ex) {
+    @ExceptionHandler(InvalidCredentialsException.class)
+    public ResponseEntity<String> InvalidCredentialsException(InvalidTokenException ex) {
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(UnauthorizedUserException.class)
+    public ResponseEntity<String> InvalidCredentialsException(UnauthorizedUserException ex) {
         return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
     }
 }
