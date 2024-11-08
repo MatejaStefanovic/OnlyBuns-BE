@@ -1,6 +1,9 @@
 package org.onlybuns.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import org.onlybuns.enums.UserRole;
 
 @Entity
@@ -11,20 +14,34 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
+    @NotNull
+    @Size(min = 3, max = 16)
+    @Column(unique = true)
     private String username;
+
+    @NotNull
+    @Size(min = 8, max = 128)
     private String password;
+
+    @NotNull
     private String firstName;
+
+    @NotNull
     private String lastName;
+
+    @Email
+    @Column(unique = true)
     private String email;
+
     private boolean isActivated;
 
+    @NotNull
     @ManyToOne
+    @JoinColumn(name = "location_id")
     private Location location;
 
     @Enumerated(EnumType.STRING)  // Store the enum as a string in the database
     private UserRole role;
-
-
 
     public User(UserRole role, Location location, boolean isActivated, String email, String lastName, String firstName, String password, String username) {
         this.role = role;

@@ -23,8 +23,6 @@ spring.jpa.show-sql=true
 spring.jpa.properties.hibernate.cache.use_second_level_cache=false
 
 spring.jpa.hibernate.ddl-auto=update
-spring.jpa.show-sql=true
-spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.PostgreSQLDialect
 
 # Mail Server
 spring.mail.host=smtp.gmail.com
@@ -36,6 +34,6 @@ spring.mail.smtp.auth=true
 spring.mail.smtp.starttls.enable=true
 spring.mail.default-encoding=UTF-8
 
-# Secret key - Ovo ne treba da bude na github-u ali eto
+# Secret key - Ovo ne treba da bude na github-u
 app.jwt.secret=Zm9vYmFyYmF6Ym9iY29hZmdoZz9QXhGyAdwtf9hB1SkZB0dywWz2zrfyy8zqR0psG
-app.jwt.expiration=3600000
+
