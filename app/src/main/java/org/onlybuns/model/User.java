@@ -1,9 +1,7 @@
 package org.onlybuns.model;
 
 import jakarta.persistence.*;
-
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import org.onlybuns.enums.UserRole;
 
 @Entity
 @Table(name = "users")
@@ -15,23 +13,45 @@ public class User {
 
     private String username;
     private String password;
-    private String first_name;
-    private String last_name;
+    private String firstName;
+    private String lastName;
     private String email;
+    private boolean isActivated;
 
     @ManyToOne
     private Location location;
 
-    public User(String username, String password, String first_name, String last_name,  String email, Location location) {
-        this.username = username;
-        this.password = password;
-        this.first_name = first_name;
-        this.last_name = last_name;
-        this.email = email;
-        this.location = location;
+    @Enumerated(EnumType.STRING)  // Store the enum as a string in the database
+    private UserRole role;
 
+
+
+    public User(UserRole role, Location location, boolean isActivated, String email, String lastName, String firstName, String password, String username) {
+        this.role = role;
+        this.location = location;
+        this.isActivated = isActivated;
+        this.email = email;
+        this.lastName = lastName;
+        this.firstName = firstName;
+        this.password = password;
+        this.username = username;
     }
 
+    public boolean isActivated() {
+        return isActivated;
+    }
+
+    public void setActivated(boolean activated) {
+        isActivated = activated;
+    }
+
+    public UserRole getRole() {
+        return role;
+    }
+
+    public void setRole(UserRole role) {
+        this.role = role;
+    }
 
     public String getUsername() {
         return username;
@@ -53,12 +73,12 @@ public class User {
         this.password = password;
     }
 
-    public String getFirst_name() {
-        return first_name;
+    public String getFirstName() {
+        return firstName;
     }
 
-    public void setFirst_name(String first_name) {
-        this.first_name = first_name;
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
     }
 
     public Location getLocation() {
@@ -69,12 +89,12 @@ public class User {
         this.location = location;
     }
 
-    public String getLast_name() {
-        return last_name;
+    public String getLastName() {
+        return lastName;
     }
 
-    public void setLast_name(String last_name) {
-        this.last_name = last_name;
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
     }
 
     public String getEmail() {
