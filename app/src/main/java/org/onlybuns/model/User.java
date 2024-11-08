@@ -1,5 +1,7 @@
 package org.onlybuns.model;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
@@ -36,13 +38,38 @@ public class User {
     private boolean isActivated;
 
     @NotNull
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "location_id")
     private Location location;
 
     @Enumerated(EnumType.STRING)  // Store the enum as a string in the database
     private UserRole role;
+    public User() {
+    }
 
+    // Constructor for JSON deserialization with @JsonCreator and @JsonProperty
+    @JsonCreator
+    public User(
+            @JsonProperty("id") long id,
+            @JsonProperty("username") String username,
+            @JsonProperty("password") String password,
+            @JsonProperty("firstName") String firstName,
+            @JsonProperty("lastName") String lastName,
+            @JsonProperty("email") String email,
+            @JsonProperty("isActivated") boolean isActivated,
+            @JsonProperty("location") Location location,
+            @JsonProperty("role") UserRole role
+    ) {
+        this.id = id;
+        this.username = username;
+        this.password = password;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.email = email;
+        this.isActivated = isActivated;
+        this.location = location;
+        this.role = role;
+    }
     public User(UserRole role, Location location, boolean isActivated, String email, String lastName, String firstName, String password, String username) {
         this.role = role;
         this.location = location;
