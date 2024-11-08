@@ -22,14 +22,34 @@ repositories {
 dependencies {
     // This dependency is used by the application.
     implementation libs.guava
-    developmentOnly 'org.springframework.boot:spring-boot-devtools'
+    developmentOnly 'org.springframework.boot:spring-boot-devtools' // Za hot reloading (meni ne radi :d) 
     implementation 'org.springframework.boot:spring-boot-starter' // Core Spring Boot Starter
     implementation 'org.springframework.boot:spring-boot-starter-web' // For web applications
     testImplementation 'org.springframework.boot:spring-boot-starter-test' // Testing dependencies
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.1.0'  // Swagger dependency
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa' // Java persistance dependency
-    implementation 'org.postgresql:postgresql:42.7.4' 
+    implementation 'org.postgresql:postgresql:42.7.4' // Postgres
+    implementation 'org.springframework.boot:spring-boot-starter-mail' //Mail Service
     runtimeOnly 'com.h2database:h2' // H2 Database for in-memory testing
+
+    implementation('org.springframework.boot:spring-boot-starter-log4j2') //Base log4j2
+
+    // Dodatne funkcionalnosti za log4j2
+    implementation 'org.apache.logging.log4j:log4j-api'
+    implementation 'org.apache.logging.log4j:log4j-core'
+    implementation 'org.apache.logging.log4j:log4j-slf4j-impl'
+    
+    // JWT 
+    implementation 'io.jsonwebtoken:jjwt-api:0.12.6'
+    implementation 'io.jsonwebtoken:jjwt-impl:0.12.6'
+    implementation 'io.jsonwebtoken:jjwt-jackson:0.12.6'
+
+    implementation 'org.springframework.boot:spring-boot-starter-security' // Koristimo BCrypt za hesiranje lozinki da se ne cuvaju u plain text-u
+    configurations {
+        all {
+            exclude group: 'org.springframework.boot', module: 'spring-boot-starter-logging' // Izbaci Logback zato sto koristimo log4j2
+        }
+    }
 }
 
 
