@@ -9,21 +9,21 @@ import java.util.Properties;
 
 @Configuration
 public class EmailConfig {
+
     @Bean
-    public JavaMailSender javaMailSender() {
+    public JavaMailSender getJavaMailSender() {
         JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
         mailSender.setHost("smtp.gmail.com");
         mailSender.setPort(587);
-        mailSender.setUsername("onlybuns.app.support@gmail.com");
-        mailSender.setPassword("ihxd nbpd mils lolh ");
+        mailSender.setUsername("onlybuns.app.activation@gmail.com");
+        mailSender.setPassword("woztokdcvbaeyqqu"); // App password here
 
         Properties props = mailSender.getJavaMailProperties();
         props.put("mail.smtp.auth", "true");
         props.put("mail.smtp.starttls.enable", "true");
-        props.put("mail.smtp.starttls.required", "true");
         props.put("mail.smtp.ssl.trust", "smtp.gmail.com");
+        props.put("mail.debug", "true");  // Enables mail debugging
 
         return mailSender;
     }
 }
-

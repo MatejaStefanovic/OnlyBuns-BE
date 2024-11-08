@@ -2,8 +2,7 @@ package org.onlybuns.security;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.onlybuns.exceptions.UserRegistration.EmailAlreadyExistsException;
-import org.onlybuns.exceptions.UserRegistration.UsernameAlreadyExistsException;
+import org.onlybuns.exceptions.UserRegistration.*;
 import org.onlybuns.model.User;
 import org.onlybuns.repository.UserRepository;
 import org.onlybuns.service.EmailService;
@@ -37,20 +36,23 @@ public class AuthenticationService {
         User user = userRepository.findByUsername(username);
         if (user == null) {
             logger.warn("Login failed. Username {} not found.", username);
-            return null;  // Return null or an appropriate message
+            throw new InvalidCredentialsException("Username not found");
         }
 
         // Check if the password matches (using BCrypt for password hashing)
         if (!passwordEncoder.matches(password, user.getPassword())) {
             logger.warn("Login failed. Incorrect password for user: {}", username);
-            return null;  // Return null or an appropriate message
+            throw new InvalidCredentialsException("Incorrect password");
         }
-
+        if(!user.isActivated()){
+            throw new UnauthorizedUserException("User is not verified");
+        }
         logger.info("User {} logged in successfully.", username);
 
         // Generate JWT token and return it
         return tokenProvider.generateToken(user.getEmail());
     }
+
 
     public void registerUser(User user){
         if (userRepository.existsByUsername(user.getUsername())) {
@@ -59,6 +61,7 @@ public class AuthenticationService {
         if (userRepository.existsByEmail(user.getEmail())) {
             throw new EmailAlreadyExistsException("Email is already registered");
         }
+
         String hashedPassword = encodePassword(user.getPassword());
         user.setPassword(hashedPassword);
         userRepository.save(user);

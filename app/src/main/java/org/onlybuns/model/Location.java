@@ -12,6 +12,8 @@ public class Location {
     private String city;
     private String street;
 
+    public Location(){}
+
     public Location( String country, String street, String city) {
         this.country = country;
         this.street = street;

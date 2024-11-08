@@ -45,6 +45,8 @@ dependencies {
     implementation 'io.jsonwebtoken:jjwt-jackson:0.12.6'
 
     implementation 'org.springframework.boot:spring-boot-starter-security' // Koristimo BCrypt za hesiranje lozinki da se ne cuvaju u plain text-u
+    implementation 'org.springframework.boot:spring-boot-starter-mail'
+
     configurations {
         all {
             exclude group: 'org.springframework.boot', module: 'spring-boot-starter-logging' // Izbaci Logback zato sto koristimo log4j2
