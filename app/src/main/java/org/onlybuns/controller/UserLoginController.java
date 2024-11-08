@@ -35,21 +35,29 @@ public class UserLoginController {
     }
 
     @PostMapping("/login")
+    @Operation(summary = "Login to the system", description = "Authenticate user using username and password")
+    @ApiResponse(responseCode = "200", description = "User logged in successfully")
+    @ApiResponse(responseCode = "400", description = "Unauthorized user")
+    @ApiResponse(responseCode = "401", description = "Invalid credentials")
     public ResponseEntity<String> loginUser(@Valid @RequestBody LoginRequestDTO loginRequestDTO) {
         try {
             userLoginService.loginUser(loginRequestDTO.getUsername(), loginRequestDTO.getPassword());
             return new ResponseEntity<>("User logged in successfully", HttpStatus.OK);
-        } catch (UsernameAlreadyExistsException | EmailAlreadyExistsException e) {
+        } catch (InvalidCredentialsException  e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        } catch (UnauthorizedUserException e){
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.UNAUTHORIZED);
         }
     }
 
     @GetMapping("/activate")
     public ResponseEntity<String> activateUser(@RequestParam("token") String token) {
+        System.out.println("Received token: " + token);  // Log token received
         try {
             userLoginService.activateUser(token);
             return ResponseEntity.ok("Account activated successfully.");
         } catch (InvalidTokenException e) {
+            e.printStackTrace();  // Log exception for more details
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid or expired token.");
         }
     }
