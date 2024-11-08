@@ -1,5 +1,7 @@
 package org.onlybuns.service;
 
+import org.onlybuns.exceptions.UserRegistration.*;
+import org.onlybuns.model.User;
 import org.onlybuns.repository.UserRepository;
 
 import java.util.regex.Matcher;
@@ -21,5 +23,36 @@ public class UserService {
         // Match the input email to the pattern
         Matcher matcher = pattern.matcher(email);
         return matcher.matches();
+    }
+
+    public void registerUser(User user) {
+        if(!hasAllFields(user)){
+            throw new MissingRegistrationFieldsException("Fields must not be blank or empty");
+        }
+        if(!isValidEmail(user.getEmail())){
+            throw new InvalidEmailFormatException("Email is not in a valid format");
+        }
+        if (userRepository.existsByUsername(user.getUsername())) {
+            throw new UsernameAlreadyExistsException("Username is already taken");
+        }
+        if (userRepository.existsByEmail(user.getEmail())) {
+            throw new EmailAlreadyExistsException("Email is already registered");
+        }
+        userRepository.save(user);
+    }
+
+    public void activateUser(User user){
+        userRepository.save(user);
+    }
+
+    public boolean hasAllFields(User user){
+        return !user.getEmail().isBlank() &&
+                !user.getUsername().isBlank() &&
+                !user.getFirstName().isBlank() &&
+                !user.getLastName().isBlank() &&
+                !user.getPassword().isBlank() &&
+                !user.getLocation().getCountry().isBlank() &&
+                !user.getLocation().getCity().isBlank() &&
+                !user.getLocation().getStreet().isBlank();
     }
 }
