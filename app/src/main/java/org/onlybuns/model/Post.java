@@ -11,17 +11,34 @@ public class Post {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private int id;
     private  String description;
     private LocalDateTime creationDateTime;
 
-    public Post(long id, String description, LocalDateTime creationDateTime) {
+    @OneToOne
+    @JoinColumn(name = "image_id", referencedColumnName = "id")
+    private Image image;
+
+    @ManyToOne(cascade = CascadeType.PERSIST)
+    @JoinColumn(name = "location_id")
+    private Location location;
+    /*@ManyToOne
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;*/
+
+    public Post() {
+
+    }
+
+    public Post(int id, String description, LocalDateTime creationDateTime, Image image, Location location) {
         this.id = id;
         this.description = description;
         this.creationDateTime = creationDateTime;
+        this.location = location;
+        this.image = image;
     }
 
-    public long getId() {
+    public int getId() {
         return id;
     }
 
@@ -33,19 +50,32 @@ public class Post {
         return creationDateTime;
     }
 
-    public void setCreationDateTime(LocalDateTime creationDateTime) {
-        this.creationDateTime = creationDateTime;
+
+   public Image getImage() {
+        return image;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     public void setDescription(String description) {
         this.description = description;
     }
 
-    public void setId(long id) {
-        this.id = id;
+    public void setCreationDateTime(LocalDateTime creationDateTime) {
+        this.creationDateTime = creationDateTime;
     }
 
-
+    public void setImage(Image image) {
+        this.image = image;
+    }
+    public Location getLocation() {
+        return location;
+    }
+    public void setLocation(Location location) {
+        this.location = location;
+    }
 }
 
 

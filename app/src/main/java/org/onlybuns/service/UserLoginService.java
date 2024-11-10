@@ -1,10 +1,15 @@
 package org.onlybuns.service;
 
+import jakarta.servlet.http.HttpServletRequest;
 import org.onlybuns.exceptions.Security.*;
 import org.onlybuns.model.User;
 import org.onlybuns.repository.UserRepository;
 import org.onlybuns.security.AuthenticationService;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 @Service
 public class UserLoginService {
@@ -12,6 +17,7 @@ public class UserLoginService {
     private final UserRepository userRepository;
     private final AuthenticationService authenticationService;
     private final EmailService emailService;
+
 
     // Constructor injection, Spring automatically wires the dependency
     public UserLoginService(UserRepository userRepository, EmailService emailService, AuthenticationService authenticationService) {
@@ -65,4 +71,29 @@ public class UserLoginService {
             throw new InvalidTokenException("Invalid or expired activation token.");
         }
     }
+
+    public User getCurrentUser() {
+        // Izvlači token iz Authorization zaglavlja
+        ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+        if (attributes != null) {
+            HttpServletRequest request = attributes.getRequest();
+            String authorizationHeader = request.getHeader("Authorization");
+
+            if (authorizationHeader != null) {
+                String token;
+                if (authorizationHeader.startsWith("Bearer ")) {
+                    // Uklanja "Bearer " prefiks
+                    token = authorizationHeader.substring(7);
+                } else {
+                    // Pretpostavlja da je ceo sadržaj zaglavlja token
+                    token = authorizationHeader;
+                }
+
+                String email = authenticationService.getEmailFromJWT(token);
+                return userRepository.findByEmail(email);
+            }
+        }
+        return null; // Vraća null ako nema validnog tokena
+    }
+
 }
