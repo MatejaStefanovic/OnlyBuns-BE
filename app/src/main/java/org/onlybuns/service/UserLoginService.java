@@ -2,6 +2,7 @@ package org.onlybuns.service;
 
 import jakarta.servlet.http.HttpServletRequest;
 import org.onlybuns.exceptions.Security.*;
+import org.onlybuns.exceptions.UserRegistration.*;
 import org.onlybuns.model.User;
 import org.onlybuns.repository.UserRepository;
 import org.onlybuns.security.AuthenticationService;
@@ -26,13 +27,14 @@ public class UserLoginService {
         this.authenticationService = authenticationService;
     }
 
-    public void loginUser(String username, String password) {
+    public String loginUser(String username, String password) {
         // Call AuthenticationService to verify credentials and generate a JWT token
         String jwtToken = authenticationService.loginUser(username, password);
 
         if (jwtToken == null) {
             throw new InvalidTokenException("Invalid login credentials");
         }
+        return jwtToken;
 
     }
     public void registerUser(User user) {
@@ -71,7 +73,14 @@ public class UserLoginService {
             throw new InvalidTokenException("Invalid or expired activation token.");
         }
     }
-
+    
+    public User getUserByUsername(String username) {
+    	User user = userRepository.findByUsername(username);
+    	if (user != null && user.isActivated()) {
+    		return user;
+    	} else
+    		throw new UnauthorizedUserException("User is not verified");
+    }
     public User getCurrentUser() {
         // Izvlači token iz Authorization zaglavlja
         ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
@@ -95,5 +104,4 @@ public class UserLoginService {
         }
         return null; // Vraća null ako nema validnog tokena
     }
-
 }
