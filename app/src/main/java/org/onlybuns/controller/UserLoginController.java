@@ -4,6 +4,10 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.validation.Valid;
 import org.onlybuns.DTOs.LoginRequestDTO;
+import org.onlybuns.DTOs.AuthResponseDTO;
+import org.onlybuns.DTOs.UserDTO;
+import org.onlybuns.DTOs.LocationDTO;
+import org.onlybuns.DTOs.ResponseDTO;
 import org.onlybuns.exceptions.Security.InvalidTokenException;
 import org.onlybuns.exceptions.UserRegistration.*;
 import org.onlybuns.model.User;
@@ -14,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/user")
+@CrossOrigin(origins = "http://localhost:3000")
 public class UserLoginController {
 
     private final UserLoginService userLoginService;
@@ -25,12 +30,15 @@ public class UserLoginController {
     @PostMapping("/register")
     @Operation(summary = "Register a new user", description = "Register a new user by providing their details")
     @ApiResponse(responseCode = "200", description = "User registered successfully")
-    public ResponseEntity<String> registerUser(@Valid @RequestBody User user) {
+    public ResponseEntity<ResponseDTO> registerUser(@Valid @RequestBody User user) {
         try {
             userLoginService.registerUser(user);
-            return new ResponseEntity<>("User registered successfully", HttpStatus.CREATED);
+            
+            ResponseDTO response = new ResponseDTO("User registered successfully");
+            		
+            return new ResponseEntity<ResponseDTO>(response, HttpStatus.CREATED);
         } catch (UsernameAlreadyExistsException | EmailAlreadyExistsException e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<ResponseDTO>(new ResponseDTO(e.getMessage()), HttpStatus.BAD_REQUEST);
         }
     }
 
@@ -39,14 +47,26 @@ public class UserLoginController {
     @ApiResponse(responseCode = "200", description = "User logged in successfully")
     @ApiResponse(responseCode = "400", description = "Unauthorized user")
     @ApiResponse(responseCode = "401", description = "Invalid credentials")
-    public ResponseEntity<String> loginUser(@Valid @RequestBody LoginRequestDTO loginRequestDTO) {
+    public ResponseEntity<Object> loginUser(@Valid @RequestBody LoginRequestDTO loginRequestDTO) {
         try {
-            userLoginService.loginUser(loginRequestDTO.getUsername(), loginRequestDTO.getPassword());
-            return new ResponseEntity<>("User logged in successfully", HttpStatus.OK);
+            String JWT = userLoginService.loginUser(loginRequestDTO.getUsername(), loginRequestDTO.getPassword());
+            User user = userLoginService.getUserByUsername(loginRequestDTO.getUsername());
+            UserDTO userDTO = new UserDTO(
+            	    user.getUsername(),       
+            	    user.getFirstName(),          
+            	    user.getLastName(),       
+            	    user.getEmail(),              
+            	    user.isActivated(),          
+            	    new LocationDTO(user.getLocation()),      
+            	    user.getRole().name()                
+            );
+            AuthResponseDTO authResponseDTO = new AuthResponseDTO(JWT,  userDTO);
+            return new ResponseEntity<>(authResponseDTO, HttpStatus.OK);
+            
         } catch (InvalidCredentialsException  e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(new ResponseDTO(e.getMessage()), HttpStatus.BAD_REQUEST);
         } catch (UnauthorizedUserException e){
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.UNAUTHORIZED);
+            return new ResponseEntity<>(new ResponseDTO(e.getMessage()), HttpStatus.UNAUTHORIZED);
         }
     }
 
@@ -54,7 +74,7 @@ public class UserLoginController {
     public ResponseEntity<String> activateUser(@RequestParam("token") String token) {
         System.out.println("Received token: " + token);  // Log token received
         try {
-            userLoginService.activateUser(token);
+            userLoginService.activateUser(token);          		
             return ResponseEntity.ok("Account activated successfully.");
         } catch (InvalidTokenException e) {
             e.printStackTrace();  // Log exception for more details
