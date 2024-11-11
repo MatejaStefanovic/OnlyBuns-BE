@@ -3,7 +3,9 @@ package org.onlybuns.model;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 @Entity
 @Table(name = "posts")
@@ -15,7 +17,7 @@ public class Post {
     private  String description;
     private LocalDateTime creationDateTime;
 
-    @OneToOne
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "image_id", referencedColumnName = "id")
     private Image image;
 
@@ -26,8 +28,12 @@ public class Post {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;*/
 
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Comment> comments;
+
     public Post() {
 
+        comments = new ArrayList<Comment>();
     }
 
     public Post(int id, String description, LocalDateTime creationDateTime, Image image, Location location) {
@@ -36,7 +42,10 @@ public class Post {
         this.creationDateTime = creationDateTime;
         this.location = location;
         this.image = image;
+        comments = new ArrayList<Comment>();
     }
+
+    //Dodaj ti ako hoces konstruktor koji ima i Komentare u sebi, meni treba ovaj gore bez komentara
 
     public int getId() {
         return id;
