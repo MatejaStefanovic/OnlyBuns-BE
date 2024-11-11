@@ -6,6 +6,7 @@ import org.hibernate.annotations.Parameter;
 import org.onlybuns.DTOs.PostCreationDTO;
 import org.onlybuns.model.Location;
 import org.onlybuns.model.Post;
+import org.onlybuns.model.User;
 import org.onlybuns.service.PostService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -37,9 +38,11 @@ public class PostController {
                            @RequestPart("image") MultipartFile image,
                            @RequestPart("city") String city,
                            @RequestPart("country") String country,
-                           @RequestPart("street") String street) {
+                           @RequestPart("street") String street,
+                           @RequestPart("email") String email
+                           ) {
 
-            return postService.createPost(new PostCreationDTO(description,image, new Location(country,street,city)));
+            return postService.createPost(new PostCreationDTO(description,image, new Location(country,street,city),email));
     }
 
     @GetMapping

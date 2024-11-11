@@ -18,35 +18,23 @@ import java.util.List;
 public class PostService {
 
     private final PostRepository postRepository;
-    private final UserLoginService userLoginService;
+    private final UserRepository userRepository;
     private final FileStorageSerivce2 fileStorageService;
 
     @Autowired
-    public PostService(PostRepository postRepository, UserLoginService userLoginService, FileStorageSerivce2 fileStorageService) {
+    public PostService(PostRepository postRepository, UserRepository userRepository, FileStorageSerivce2 fileStorageService) {
         this.postRepository = postRepository;
-        this.userLoginService = userLoginService;
+        this.userRepository = userRepository;
         this.fileStorageService = fileStorageService;
     }
-
-/*    public Post createPost(Post post, MultipartFile imageFile) throws IOException  {
-        post.setCreationDateTime(LocalDateTime.now());
-      //  User user = userLoginService.getCurrentUser();
-      //  post.setUser(user);
-        // Sačuvaj sliku i dobavi relativnu putanju
-        String imagePath = fileStorageService.saveImage(imageFile);
-
-        // Postavi relativnu putanju u entitet
-        post.setImagePath(imagePath);
-        return postRepository.save(post);
-    }*/
 
     public Post createPost(PostCreationDTO postCreationDTO) {
         Post post = new Post();
         post.setDescription(postCreationDTO.getDescription());
         post.setLocation(postCreationDTO.getLocation());
         post.setCreationDateTime(LocalDateTime.now());
-        User user = userLoginService.getCurrentUser();
-        //post.setUser(user);
+        User user = userRepository.findByEmail(postCreationDTO.getEmail());
+        post.setUser(user);
         if (postCreationDTO.getImage() != null && !postCreationDTO.getImage().isEmpty()) {
             Image image = fileStorageService.storeFile(postCreationDTO.getImage());
             post.setImage(image);
@@ -54,10 +42,6 @@ public class PostService {
 
         return postRepository.save(post);
     }
-
-
-
-
 
     public List<Post> getAllPosts() {
         return postRepository.findAll();

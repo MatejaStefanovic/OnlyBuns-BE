@@ -24,12 +24,16 @@ public class Post {
     @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "location_id")
     private Location location;
-    /*@ManyToOne
+
+    @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
-    private User user;*/
+    private User user;
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Comment> comments;
+
+    private int likes;
+
 
     public Post() {
 
@@ -42,10 +46,20 @@ public class Post {
         this.creationDateTime = creationDateTime;
         this.location = location;
         this.image = image;
-        comments = new ArrayList<Comment>();
+        this.comments = new ArrayList<Comment>();
+        this.likes = 0;
     }
 
-    //Dodaj ti ako hoces konstruktor koji ima i Komentare u sebi, meni treba ovaj gore bez komentara
+    public Post(int id, String description, LocalDateTime creationDateTime, Image image, Location location, List<Comment> comments, int likes) {
+        this.id = id;
+        this.description = description;
+        this.creationDateTime = creationDateTime;
+        this.location = location;
+        this.image = image;
+        this.comments = new ArrayList<Comment>(comments);
+        this.likes = likes;
+    }
+
 
     public int getId() {
         return id;
@@ -85,6 +99,14 @@ public class Post {
     public void setLocation(Location location) {
         this.location = location;
     }
+
+    public User getUser() {
+        return user;
+    }
+    public void setUser(User user) {
+        this.user = user;
+    }
+
 }
 
 

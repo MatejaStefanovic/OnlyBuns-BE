@@ -11,11 +11,13 @@ public class PostCreationDTO {
     private String description;
     private MultipartFile image;
     private Location location;
+    private String email;
 
-    public PostCreationDTO(String description, MultipartFile image, Location location) {
+    public PostCreationDTO(String description, MultipartFile image, Location location, String email) {
         this.description = description;
         this.image = image;
         this.location = location;
+        this.email = email;
 
     }
 
@@ -33,13 +35,14 @@ public class PostCreationDTO {
         this.location = location;
     }
 
-  /*  public User getUser() {
-        return user;
+
+    public String getEmail() {
+        return email;
     }
 
-    public void setUser(User user) {
-        this.user = user;
-    }*/
+    public void setEmail(String email) {
+        this.email = email;
+    }
 
     public MultipartFile getImage() {
         return image;
