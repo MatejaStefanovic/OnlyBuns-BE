@@ -6,6 +6,8 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
 @EnableWebSecurity
@@ -28,7 +30,11 @@ public class SecurityConfig {
                         .requestMatchers("/api/user/register").permitAll()
                         .requestMatchers("/api/user/activate").permitAll()
                         .requestMatchers("/api/user/login").permitAll()
+
                         .requestMatchers("/api/post").permitAll()
+
+                        .requestMatchers("/api/admin/users").permitAll()
+
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-resources/**", "/webjars/**", "/swagger-ui.html")
                 .permitAll()
                 // Require authentication for other endpoints
@@ -36,4 +42,6 @@ public class SecurityConfig {
 
         return http.build();
     }
+
+
 }

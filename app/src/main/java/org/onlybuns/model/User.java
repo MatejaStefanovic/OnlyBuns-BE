@@ -31,6 +31,12 @@ public class User {
     @NotNull
     private String lastName;
 
+    @NotNull
+    private Integer numberOfPosts = 0;
+
+    @NotNull
+    private Integer numberOfFollowing = 0;
+
     @Email
     @Column(unique = true)
     private String email;
@@ -49,7 +55,7 @@ public class User {
     public User() {
     }
 
-    public User(UserRole role, Location location, boolean isActivated, String email, String lastName, String firstName, String password, String username) {
+    public User(UserRole role, Location location, boolean isActivated, String email, String lastName, String firstName, String password, String username, Integer numberOfFollowing, Integer numberOfPosts) {
         this.role = role;
         this.location = location;
         this.isActivated = isActivated;
@@ -58,7 +64,17 @@ public class User {
         this.firstName = firstName;
         this.password = password;
         this.username = username;
+        this.numberOfFollowing = numberOfFollowing;
+        this.numberOfPosts = numberOfPosts;
     }
+
+    public Integer getNumberOfPosts() {return numberOfPosts; }
+
+    public void setNumberOfPosts(Integer number){ numberOfPosts = number;}
+
+    public Integer getNumberOfFollowing() {return numberOfFollowing;}
+
+    public void setNumberOfFollowing(Integer number) {numberOfFollowing = number;}
 
     public boolean isActivated() {
         return isActivated;

@@ -11,6 +11,8 @@ public class UserDTO {
     private boolean isActivated;
     private LocationDTO location;
     private String role;
+    private int numberOfPosts = 0;
+    private int numberOfFollowing = 0;
 
     public UserDTO(String username, String firstName, String lastName, String email, boolean isActivated, LocationDTO location, String role) {
         this.username = username;
@@ -61,4 +63,20 @@ public class UserDTO {
 	public void setActivated(boolean activated) {
 	    isActivated = activated;
 	}
+
+     public int getNumberOfPosts() {
+        return numberOfPosts;
+    }
+    public void setNumberOfPosts(int numberOfPosts) {
+        this.numberOfPosts = numberOfPosts;
+    }
+    public int getNumberOfFollowing() {
+        return numberOfFollowing;
+    }
+    public void setNumberOfFollowing(int numberOfFollowing) {
+        this.numberOfFollowing = numberOfFollowing;
+    }
+ 
 }
+
+   
