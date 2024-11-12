@@ -37,6 +37,22 @@ public class PostService {
         this.likeRepository = likeRepository;
         this.commentRepository = commentRepository;
     }
+    public Post updatePost(Long postId, PostCreationDTO postDTO) throws IOException {
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new IllegalArgumentException("Post not found for ID: " + postId));
+
+        post.setDescription(postDTO.getDescription());
+        post.setLocation(postDTO.getLocation());
+
+        if (postDTO.getImage() != null && !postDTO.getImage().isEmpty()) {
+            Image updatedImage = fileStorageService.storeFile(postDTO.getImage());
+            fileStorageService.getImageBase64ForImage(updatedImage);
+            post.setImage(updatedImage);
+        }
+
+        return postRepository.save(post);
+    }
+
     public Post createPost(PostCreationDTO postCreationDTO) throws IOException {
         Post post = new Post();
         post.setDescription(postCreationDTO.getDescription());

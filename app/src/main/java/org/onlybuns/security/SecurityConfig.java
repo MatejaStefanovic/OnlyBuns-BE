@@ -39,6 +39,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/user/activate").permitAll()
                         .requestMatchers("/api/user/login").permitAll()
                         .requestMatchers("/api/posts/all").permitAll()
+                        .requestMatchers("/api/posts/update/{postId}").permitAll()
                         .requestMatchers("/api/user/register", "/api/user/activate", "/api/user/login").permitAll()
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-resources/**", "/webjars/**", "/swagger-ui.html").permitAll()
                         // Require authentication for all other endpoints
