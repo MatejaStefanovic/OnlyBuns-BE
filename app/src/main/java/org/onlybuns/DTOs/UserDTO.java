@@ -23,7 +23,23 @@ public class UserDTO {
         this.location = location;
         this.role = role;
     }
-    
+
+    public LocationDTO getLocation() {
+        return location;
+    }
+
+    public void setLocation(LocationDTO location) {
+        this.location = location;
+    }
+
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
+    }
+
     public String getUsername() {
         return username;
     }

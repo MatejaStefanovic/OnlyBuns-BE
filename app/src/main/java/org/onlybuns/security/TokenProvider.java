@@ -42,7 +42,7 @@ public class TokenProvider {
         return Keys.hmacShaKeyFor(keyBytes);
     }
 
-    public String getEmailFromJWT(String token) {
+    public String getSubjectFromJWT(String token) {
         Claims claims = Jwts.parser()
                 .verifyWith(getSecretKey())
                 .build()

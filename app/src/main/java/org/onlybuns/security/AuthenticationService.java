@@ -30,24 +30,24 @@ public class AuthenticationService {
     private BCryptPasswordEncoder passwordEncoder;  // For password hashing and comparison
 
     // Example method for user login
-    public String loginUser(String username, String password) {
-        logger.info("Attempting login for username: {}", username);
+    public String loginUser(String email, String password) {
+        logger.info("Attempting login for email: {}", email);
 
-        User user = userRepository.findByUsername(username);
+        User user = userRepository.findByEmail(email);
         if (user == null) {
-            logger.warn("Login failed. Username {} not found.", username);
-            throw new InvalidCredentialsException("Username not found");
+            logger.warn("Login failed. Email {} not found.", email);
+            throw new InvalidCredentialsException("Email not found");
         }
 
         // Check if the password matches (using BCrypt for password hashing)
         if (!passwordEncoder.matches(password, user.getPassword())) {
-            logger.warn("Login failed. Incorrect password for user: {}", username);
+            logger.warn("Login failed. Incorrect password for user: {}", email);
             throw new InvalidCredentialsException("Incorrect password");
         }
         if(!user.isActivated()){
             throw new UnauthorizedUserException("User is not verified");
         }
-        logger.info("User {} logged in successfully.", username);
+        logger.info("User {} logged in successfully.", email);
 
         // Generate JWT token and return it
         return tokenProvider.generateToken(user.getEmail());
@@ -77,7 +77,7 @@ public class AuthenticationService {
     }
 
     public String getEmailFromJWT(String token) {
-        return tokenProvider.getEmailFromJWT(token);
+        return tokenProvider.getSubjectFromJWT(token);
     }
 }
 

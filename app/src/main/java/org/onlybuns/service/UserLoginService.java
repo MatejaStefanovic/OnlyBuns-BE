@@ -27,9 +27,9 @@ public class UserLoginService {
         this.authenticationService = authenticationService;
     }
 
-    public String loginUser(String username, String password) {
+    public String loginUser(String email, String password) {
         // Call AuthenticationService to verify credentials and generate a JWT token
-        String jwtToken = authenticationService.loginUser(username, password);
+        String jwtToken = authenticationService.loginUser(email, password);
 
         if (jwtToken == null) {
             throw new InvalidTokenException("Invalid login credentials");
@@ -74,8 +74,8 @@ public class UserLoginService {
         }
     }
     
-    public User getUserByUsername(String username) {
-    	User user = userRepository.findByUsername(username);
+    public User getUserByEmail(String email) {
+    	User user = userRepository.findByEmail(email);
     	if (user != null && user.isActivated()) {
     		return user;
     	} else
