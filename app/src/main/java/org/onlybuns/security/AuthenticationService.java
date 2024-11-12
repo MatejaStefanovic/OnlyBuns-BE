@@ -77,7 +77,7 @@ public class AuthenticationService {
     }
 
     public String getEmailFromJWT(String token) {
-        return tokenProvider.getEmailFromJWT(token);
+        return tokenProvider.getSubjectFromJWT(token);
     }
 }
 
