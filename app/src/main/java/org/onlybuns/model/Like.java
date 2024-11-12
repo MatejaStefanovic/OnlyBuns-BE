@@ -1,7 +1,9 @@
 package org.onlybuns.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-
+@Entity
+@Table(name = "likes")
 public class Like {
 
     @Id
@@ -10,14 +12,16 @@ public class Like {
 
     @ManyToOne
     @JoinColumn(name = "post_id", nullable = false)
+    @JsonIgnore
     private Post post;
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = true) // Optional relationship to the user who commented
     private User user;
 
-    public Like(int id, User user, Post post) {
-        this.id = id;
+     public Like(){}
+
+    public Like( User user, Post post) {
         this.user = user;
         this.post = post;
     }

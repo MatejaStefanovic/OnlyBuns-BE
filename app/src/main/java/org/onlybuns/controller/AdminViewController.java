@@ -33,6 +33,6 @@ public class AdminViewController {
             return new ResponseEntity( userService.findAll(), HttpStatus.OK);
         }  catch (UnauthorizedUserException e){
         return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
-    }
+        }
     }
 }

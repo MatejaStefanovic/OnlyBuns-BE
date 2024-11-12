@@ -20,6 +20,8 @@ public class ImageCompressionService {
     @Value("${upload.path}")
     private String imageDirPath;
     @Scheduled(cron = "0 0 0 * * ?") // Pokreće se svakog dana u ponoć
+    //@Scheduled(cron = "0 * * * * ?")
+
     public void compressOldImages() {
         File imageDir = new File(imageDirPath);
         if (imageDir.exists() && imageDir.isDirectory()) {
@@ -43,6 +45,7 @@ public class ImageCompressionService {
         long oneMonthAgo = Instant.now().minus(30, ChronoUnit.DAYS).toEpochMilli();
         return fileTime < oneMonthAgo;
     }
+
 
     private boolean isCompressed(File file) {
         // Proverava da li je fajl već kompresovana verzija (ima "-compressed" u imenu)

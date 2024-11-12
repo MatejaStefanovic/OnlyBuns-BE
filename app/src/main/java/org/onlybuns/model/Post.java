@@ -1,5 +1,6 @@
 package org.onlybuns.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
@@ -39,7 +40,7 @@ public class Post {
 
 
     public Post() {
-
+        likesList = new ArrayList<Like>();
         comments = new ArrayList<Comment>();
     }
 
