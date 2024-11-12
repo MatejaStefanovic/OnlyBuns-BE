@@ -1,59 +1,52 @@
 package org.onlybuns.model;
 
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-
 @Entity
-@Table(name = "comments")
-public class Comment {
+@Table(name = "likes")
+public class Like {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    private  String description;
-
     @ManyToOne
-    @JsonIgnore
     @JoinColumn(name = "post_id", nullable = false)
+    @JsonIgnore
     private Post post;
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = true) // Optional relationship to the user who commented
     private User user;
 
-    public Comment() {}
+     public Like(){}
 
-    public Comment(int id, String description, Post post, User user) {
-        this.id = id;
-        this.description = description;
+    public Like( User user, Post post) {
+        this.user = user;
         this.post = post;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
         this.user = user;
     }
 
     public int getId() {
         return id;
     }
-    public String getDescription() {
-        return description;
-    }
-    public Post getPost() {
-        return post;
-    }
-    public User getUser() {
-        return user;
-    }
+
     public void setId(int id) {
         this.id = id;
     }
-    public void setDescription(String description) {
-        this.description = description;
+
+    public Post getPost() {
+        return post;
     }
+
     public void setPost(Post post) {
         this.post = post;
-    }
-    public void setUser(User user) {
-        this.user = user;
     }
 }

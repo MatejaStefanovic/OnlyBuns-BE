@@ -38,6 +38,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/user/register").permitAll()
                         .requestMatchers("/api/user/activate").permitAll()
                         .requestMatchers("/api/user/login").permitAll()
+                        .requestMatchers("/api/posts/all").permitAll()
                         .requestMatchers("/api/user/register", "/api/user/activate", "/api/user/login").permitAll()
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-resources/**", "/webjars/**", "/swagger-ui.html").permitAll()
                         // Require authentication for all other endpoints
@@ -46,8 +47,10 @@ public class SecurityConfig {
                 // Add JwtAuthenticationFilter before the UsernamePasswordAuthenticationFilter
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
+                  
         return http.build();
     }
+
 
     // CORS configuration
     @Bean
@@ -64,3 +67,4 @@ public class SecurityConfig {
         };
     }
 }
+

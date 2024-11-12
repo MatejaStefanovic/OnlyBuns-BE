@@ -1,5 +1,6 @@
 package org.onlybuns.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
@@ -32,11 +33,14 @@ public class Post {
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Comment> comments;
 
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Like> likesList;
+
     private int likes;
 
 
     public Post() {
-
+        likesList = new ArrayList<Like>();
         comments = new ArrayList<Comment>();
     }
 
@@ -47,19 +51,44 @@ public class Post {
         this.location = location;
         this.image = image;
         this.comments = new ArrayList<Comment>();
+        this.likesList = new ArrayList<Like>();
         this.likes = 0;
     }
 
-    public Post(int id, String description, LocalDateTime creationDateTime, Image image, Location location, List<Comment> comments, int likes) {
+    public Post(int id, String description, LocalDateTime creationDateTime, Image image, Location location, List<Comment> comments,List<Like> likesList, int likes) {
         this.id = id;
         this.description = description;
         this.creationDateTime = creationDateTime;
         this.location = location;
         this.image = image;
         this.comments = new ArrayList<Comment>(comments);
+        this.likesList = new ArrayList<Like>(likesList);
         this.likes = likes;
     }
 
+    public List<Comment> getComments() {
+        return comments;
+    }
+
+    public void setComments(List<Comment> comments) {
+        this.comments = comments;
+    }
+
+    public List<Like> getLikesList() {
+        return likesList;
+    }
+
+    public void setLikesList(List<Like> likesList) {
+        this.likesList = likesList;
+    }
+
+    public int getLikes() {
+        return likes;
+    }
+
+    public void setLikes(int likes) {
+        this.likes = likes;
+    }
 
     public int getId() {
         return id;
