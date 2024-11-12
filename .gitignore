@@ -44,7 +44,6 @@ out/
 
 # Environment settings
 *.env
-*.properties
 *.yaml
 
 # Node.js files
@@ -68,3 +67,6 @@ Thumbs.db
 # Coverage reports
 coverage/
 *.lcov
+
+# Images
+images
