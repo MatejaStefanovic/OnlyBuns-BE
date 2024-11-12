@@ -7,10 +7,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Base64;
 
 @Service
 public class FileStorageSerivce2 {
@@ -31,7 +33,9 @@ public class FileStorageSerivce2 {
             throw new RuntimeException("Could not create the directory where the uploaded files will be stored.", ex);
         }
     }
-
+    public String getImageBase64ForImage(Image image) throws IOException {
+        return image.setImageBase64(fileStorageLocation.toString());
+    }
     public Image storeFile(MultipartFile file) {
         String fileName = null;
         try {

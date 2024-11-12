@@ -75,12 +75,8 @@ public class PostInterController {
     }
     @GetMapping("/all")
     @Operation(summary = "Return list of users")
-    public ResponseEntity<List<Post>> getAll() {
-        try {
+    public ResponseEntity<List<Post>> getAll() throws IOException {
             return new ResponseEntity<List<Post>>( postService.getAllPosts(), HttpStatus.OK);
-        }  catch (UnauthorizedUserException e){
-            return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
-        }
     }
 
 }

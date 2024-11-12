@@ -24,7 +24,7 @@ public class Image {
     private String relativePath;
 
 
-    @Transient
+
     private String imageBase64;
 
 
@@ -44,19 +44,30 @@ public class Image {
     public void setRelativePath(String relativePath) {
         this.relativePath = relativePath;
     }
+    public Image(){
 
-    public String getImageBase64() throws IOException {
-        if (relativePath != null) {
-            try (InputStream inputStream = getClass().getResourceAsStream("/images/" + relativePath)) {
-                if (inputStream == null) {
-                    throw new FileNotFoundException("File not found: " + relativePath);
-                }
-
-                byte[] imageBytes = inputStream.readAllBytes();
-                return Base64.getEncoder().encodeToString(imageBytes);
-            }
-        }
-        return null;
     }
+
+    public String getImageBase64() {
+        return imageBase64;
+    }
+
+   
+   public String setImageBase64(String uploadPath) throws IOException {
+       if (relativePath != null) {
+           Path filePath = Paths.get(uploadPath, relativePath);
+           if (Files.exists(filePath)) {
+               byte[] imageBytes = Files.readAllBytes(filePath);
+               imageBase64= Base64.getEncoder().encodeToString(imageBytes);
+               return imageBase64;
+           } else {
+               throw new FileNotFoundException("File not found: " + filePath);
+           }
+       }
+       return null;
+   }
+
+
+
 
 }

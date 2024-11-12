@@ -46,7 +46,7 @@ public class PostController {
                                                           @RequestPart("country") String country,
                                                           @RequestPart("street") String street,
                                                           @RequestPart("email") String email
-                           ) {
+                           ) throws IOException {
 
         postService.createPost(new PostCreationDTO(description,image, new Location(country,street,city),email));
 
@@ -56,7 +56,7 @@ public class PostController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Post>> getAllPosts() {
+    public ResponseEntity<List<Post>> getAllPosts() throws IOException {
         List<Post> posts = postService.getAllPosts();
         return ResponseEntity.ok(posts);
     }
