@@ -21,7 +21,9 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/posts")
@@ -48,6 +50,28 @@ public class PostInterController {
         } catch (Exception e) {
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
+    @PostMapping("/{postId}/comment")
+    @Operation(summary = "Add a comment to a post")
+    public ResponseEntity<Post> addComment(@PathVariable int postId, @RequestParam String username, @RequestParam String description) {
+        try {
+            Post updatedPost = postService.addComment(postId,username, description);
+            return new ResponseEntity<>(updatedPost, HttpStatus.OK);
+        } catch (UnauthorizedUserException e) {
+            return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
+        } catch (Exception e) {
+            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @PostMapping("/{postId}/delete")
+    @Operation(summary = "Delete post")
+    public ResponseEntity<Map<String, String>>  deletePost(@PathVariable int postId) {
+
+            postService.deletePost(postId);
+            Map<String, String> response = new HashMap<>();
+            response.put("message", "Deleted");
+            return ResponseEntity.ok(response);
     }
     @GetMapping("/all")
     @Operation(summary = "Return list of users")

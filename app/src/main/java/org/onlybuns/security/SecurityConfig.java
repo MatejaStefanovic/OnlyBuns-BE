@@ -36,6 +36,8 @@ public class SecurityConfig {
 
                         .requestMatchers("/api/post").permitAll()
                         .requestMatchers("/api/posts/{postId}/like").permitAll()
+                        .requestMatchers("/api/posts/{postId}/comment").permitAll()
+                        .requestMatchers("/api/posts/{postId}/delete").permitAll()
                         .requestMatchers("/api/posts/all").permitAll()
                         .requestMatchers("/api/admin/users").permitAll()
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-resources/**", "/webjars/**", "/swagger-ui.html","/v3/**", "/swagger-ui/**")
