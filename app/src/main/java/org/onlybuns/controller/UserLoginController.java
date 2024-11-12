@@ -49,8 +49,8 @@ public class UserLoginController {
     @ApiResponse(responseCode = "401", description = "Invalid credentials")
     public ResponseEntity<Object> loginUser(@Valid @RequestBody LoginRequestDTO loginRequestDTO) {
         try {
-            String JWT = userLoginService.loginUser(loginRequestDTO.getUsername(), loginRequestDTO.getPassword());
-            User user = userLoginService.getUserByUsername(loginRequestDTO.getUsername());
+            String JWT = userLoginService.loginUser(loginRequestDTO.getEmail(), loginRequestDTO.getPassword());
+            User user = userLoginService.getUserByEmail(loginRequestDTO.getEmail());
             UserDTO userDTO = new UserDTO(
             	    user.getUsername(),       
             	    user.getFirstName(),          
