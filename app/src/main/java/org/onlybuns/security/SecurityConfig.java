@@ -16,25 +16,23 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 public class SecurityConfig {
 
     private final JWTAuthenticationFilter jwtAuthenticationFilter;
+    private final IpRateLimitingFilter ipRateLimitingFilter;
 
-    public SecurityConfig(JWTAuthenticationFilter jwtAuthenticationFilter) {
+    public SecurityConfig(JWTAuthenticationFilter jwtAuthenticationFilter, IpRateLimitingFilter ipRateLimitingFilter) {
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
+        this.ipRateLimitingFilter = ipRateLimitingFilter;
     }
 
-    // Bean for password encoding
     @Bean
     public BCryptPasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
-    // Security filter chain configuration
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        // Configure CORS and disable CSRF
-        http.cors(Customizer.withDefaults()) // Enable CORS with default configuration
-                .csrf(csrf -> csrf.disable()) // Disable CSRF for development environment (Not recommended for production)
+        http.cors(Customizer.withDefaults())
+                .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        // Allow public access to specific endpoints
                         .requestMatchers("/api/user/register").permitAll()
                         .requestMatchers("/api/user/activate").permitAll()
                         .requestMatchers("/api/user/login").permitAll()
@@ -42,25 +40,22 @@ public class SecurityConfig {
                         .requestMatchers("/api/posts/update/{postId}").permitAll()
                         .requestMatchers("/api/user/register", "/api/user/activate", "/api/user/login").permitAll()
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-resources/**", "/webjars/**", "/swagger-ui.html").permitAll()
-                        // Require authentication for all other endpoints
                         .anyRequest().authenticated()
                 )
-                // Add JwtAuthenticationFilter before the UsernamePasswordAuthenticationFilter
-                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(ipRateLimitingFilter, UsernamePasswordAuthenticationFilter.class);
 
-                  
+
         return http.build();
     }
 
-
-    // CORS configuration
     @Bean
     public WebMvcConfigurer corsConfigurer() {
         return new WebMvcConfigurer() {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/**")
-                        .allowedOrigins("http://localhost:3000") // Allow requests from localhost:3000
+                        .allowedOrigins("http://localhost:3000")
                         .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                         .allowedHeaders("*")
                         .allowCredentials(true);
@@ -68,4 +63,3 @@ public class SecurityConfig {
         };
     }
 }
-

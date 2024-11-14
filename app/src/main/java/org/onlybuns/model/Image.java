@@ -1,10 +1,6 @@
 package org.onlybuns.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Transient;
+import jakarta.persistence.*;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -24,7 +20,8 @@ public class Image {
     private String relativePath;
 
 
-
+    @Lob
+    @Column(columnDefinition = "TEXT")
     private String imageBase64;
 
 
