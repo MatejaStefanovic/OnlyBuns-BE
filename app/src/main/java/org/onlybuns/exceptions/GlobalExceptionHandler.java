@@ -1,5 +1,6 @@
 package org.onlybuns.exceptions;
 
+import org.onlybuns.exceptions.DoesNotExist.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -27,6 +28,11 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(UnauthorizedUserException.class)
     public ResponseEntity<String> InvalidCredentialsException(UnauthorizedUserException ex) {
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(UserDoesNotExistException.class)
+    public ResponseEntity<String> UserDoesNotExistException(UnauthorizedUserException ex) {
         return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
     }
 }
