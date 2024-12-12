@@ -23,7 +23,15 @@ public class UserDTO {
         this.location = location;
         this.role = role;
     }
-
+    public UserDTO(User user){
+        this.username = user.getUsername();
+        this.firstName = user.getFirstName();
+        this.lastName = user.getLastName();
+        this.email = user.getEmail();
+        this.isActivated = user.isActivated();
+        this.location = new LocationDTO(user.getLocation());
+        this.role = user.getRole().name();
+    }
     public LocationDTO getLocation() {
         return location;
     }

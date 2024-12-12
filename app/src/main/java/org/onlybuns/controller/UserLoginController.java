@@ -10,6 +10,7 @@ import org.onlybuns.DTOs.LocationDTO;
 import org.onlybuns.DTOs.ResponseDTO;
 import org.onlybuns.exceptions.Security.InvalidTokenException;
 import org.onlybuns.exceptions.UserRegistration.*;
+import org.onlybuns.exceptions.DoesNotExist.UsernameAlreadyExistsException;
 import org.onlybuns.model.User;
 import org.onlybuns.service.UserLoginService;
 import org.springframework.http.HttpStatus;
@@ -51,15 +52,7 @@ public class UserLoginController {
         try {
             String JWT = userLoginService.loginUser(loginRequestDTO.getEmail(), loginRequestDTO.getPassword());
             User user = userLoginService.getUserByEmail(loginRequestDTO.getEmail());
-            UserDTO userDTO = new UserDTO(
-            	    user.getUsername(),       
-            	    user.getFirstName(),          
-            	    user.getLastName(),       
-            	    user.getEmail(),              
-            	    user.isActivated(),          
-            	    new LocationDTO(user.getLocation()),      
-            	    user.getRole().name()                
-            );
+            UserDTO userDTO = new UserDTO(user);
             AuthResponseDTO authResponseDTO = new AuthResponseDTO(JWT,  userDTO);
             return new ResponseEntity<>(authResponseDTO, HttpStatus.OK);
             

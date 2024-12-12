@@ -1,7 +1,6 @@
 package org.onlybuns.service;
 
 import org.onlybuns.DTOs.PostCreationDTO;
-import org.onlybuns.enums.UserRole;
 import org.onlybuns.model.*;
 import org.onlybuns.repository.CommentRepository;
 import org.onlybuns.repository.LikeRepository;
@@ -9,15 +8,9 @@ import org.onlybuns.repository.PostRepository;
 import org.onlybuns.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.time.LocalDateTime;
-import java.util.Base64;
 import java.util.List;
 
 @Service
@@ -25,12 +18,12 @@ public class PostService {
 
     private final PostRepository postRepository;
     private final UserRepository userRepository;
-    private final FileStorageSerivce2 fileStorageService;
+    private final FileStorageSerivce fileStorageService;
     private final LikeRepository likeRepository;
     private final CommentRepository commentRepository;
 
     @Autowired
-    public PostService(PostRepository postRepository, UserRepository userRepository, FileStorageSerivce2 fileStorageService, LikeRepository likeRepository, CommentRepository commentRepository) {
+    public PostService(PostRepository postRepository, UserRepository userRepository, FileStorageSerivce fileStorageService, LikeRepository likeRepository, CommentRepository commentRepository) {
         this.postRepository = postRepository;
         this.userRepository = userRepository;
         this.fileStorageService = fileStorageService;

@@ -1,4 +1,4 @@
-package org.onlybuns.exceptions.UserRegistration;
+package org.onlybuns.exceptions.DoesNotExist;
 
 public class UsernameAlreadyExistsException extends RuntimeException {
     public UsernameAlreadyExistsException(String message) {
