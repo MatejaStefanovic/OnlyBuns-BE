@@ -3,6 +3,7 @@ import org.onlybuns.enums.UserRole;
 import org.onlybuns.exceptions.Security.InvalidTokenException;
 import org.onlybuns.repository.UserRepository;
 import org.onlybuns.security.AuthenticationService;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Service;
 import org.onlybuns.exceptions.Security.*;
@@ -15,17 +16,20 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
+import java.time.Instant;
+import java.util.*;
 
 @Service
 public class UserService {
     private final Logger LOG = LoggerFactory.getLogger(UserService.class);
     private final UserRepository userRepository;
     private final AuthenticationService authenticationService;
+    private final EmailService emailService;
 
-    public UserService(UserRepository userRepository,AuthenticationService authenticationService) {
+    public UserService(UserRepository userRepository,AuthenticationService authenticationService, EmailService emailService) {
         this.userRepository = userRepository;
         this.authenticationService = authenticationService;
+        this.emailService = emailService;
     }
 
     public List<User> findAll() {
@@ -34,17 +38,7 @@ public class UserService {
 
     public User findByUsername(String username) { return userRepository.findByUsername(username); }
 
-    /*public User follow(String usernameFollower, String usernameFollowing){
-        User user1 = findByUsername(usernameFollower);
-        User user2 = findByUsername(usernameFollowing);
-        int number = user2.getNumberOfFollowers()+1;
-        user2.setNumberOfFollowers(number);
-        user2.getFollowers().add(user1);
-        user1.setNumberOfFollowing(user1.getNumberOfFollowing()+1);
-        userRepository.save(user1);
-        return userRepository.save(user2);
-    }
-*/
+    
     @Transactional
     @RateLimiter(name = "followLimiter", fallbackMethod = "followFallback")
     public User follow(String usernameFollower, String usernameFollowing) {

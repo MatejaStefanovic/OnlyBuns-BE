@@ -1,5 +1,6 @@
 package org.onlybuns.service;
 
+import jakarta.transaction.Transactional;
 import org.onlybuns.DTOs.PostCreationDTO;
 import org.onlybuns.model.*;
 import org.onlybuns.repository.CommentRepository;
@@ -10,8 +11,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class PostService {
@@ -73,7 +77,7 @@ public class PostService {
 
        postRepository.delete(post);
    }
-    public Post addLike(long postId, String username, int flag) {
+    /*public Post addLike(long postId, String username, int flag) {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new IllegalArgumentException("Post not found for ID: " + postId));
 
@@ -92,25 +96,123 @@ public class PostService {
 
         likeRepository.save(like);
         return postRepository.save(post);
-    }
+    }*/
 
-    public Post addComment(long postId, String username, String description) {
+   /* public Post addComment(long postId, String username, String description) {
+
+
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new RuntimeException("Post not found"));
         User user = userRepository.findByUsername(username);
         if (user == null) {
             throw new IllegalArgumentException("User not found for username: " + username);
         }
+        if(checkIfUserCanComment(user)){
+            Comment comment = new Comment();
+            comment.setUser(user);
+            comment.setDescription(description);
+            comment.setPost(post);
+            comment.setCreationDateTime(LocalDateTime.now());
+            post.getComments().add(comment);
+            commentRepository.save(comment);
+            postRepository.save(post);
+        }
+
+
+        return post;
+    }*/
+
+    @Transactional
+    public Post addLike(long postId, String username, int flag) {
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new IllegalArgumentException("Post not found for ID: " + postId));
+
+        if (post.getUser() == null) {
+            throw new IllegalStateException("Post does not have a user assigned.");
+        }
+
+        User user = userRepository.findByUsername(username);
+        if (user == null) {
+            throw new IllegalArgumentException("User not found for username: " + username);
+        }
+
+        // Provera da li korisnik već lajkuje post
+        boolean alreadyLiked = post.getLikesList().stream()
+                .anyMatch(like -> like.getUser().getId() == user.getId());
+
+        if (alreadyLiked) {
+            post.setLikes(post.getLikes() - 1);
+            post.getLikesList().removeIf(like -> like.getUser().getId() == user.getId());
+            likeRepository.deleteByUserAndPost(user.getId(), post.getId());
+
+        }
+
+        if (!alreadyLiked) {
+
+            post.setLikes(post.getLikes() + 1);
+            Like like = new Like(user, post, LocalDateTime.now());
+            post.getLikesList().add(like);
+            likeRepository.save(like);
+        }
+
+        // Ažuriranje broja lajkova
+
+
+
+
+
+        return postRepository.save(post);
+    }
+
+
+
+    public Post addComment(long postId, String username, String description) {
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new IllegalArgumentException("Post not found"));
+
+        User user = userRepository.findByUsername(username);
+        if (user == null) {
+            throw new IllegalArgumentException("User not found");
+        }
+
+        if (!checkIfUserCanComment(user)) {
+            throw new IllegalStateException("User has exceeded the comment limit for the last hour.");
+        }
+
+        // Kreiranje i dodavanje komentara
         Comment comment = new Comment();
         comment.setUser(user);
         comment.setDescription(description);
         comment.setPost(post);
+        comment.setCreationDateTime(LocalDateTime.now());
+
         post.getComments().add(comment);
         commentRepository.save(comment);
-        postRepository.save(post);
 
-        return post;
+        return postRepository.save(post); // Vraćanje ažuriranog posta
     }
+
+
+    public boolean checkIfUserCanComment(User user) {
+        // Dohvatanje svih komentara iz repozitorijuma
+        List<Comment> comments = commentRepository.findAll();
+
+        // Trenutno vreme i vreme pre jednog sata
+        Instant oneHourAgo = Instant.now().minusSeconds(3600);
+
+        // Filtriranje komentara korisnika u poslednjih sat vremena
+        List<Comment> recentComments = comments.stream()
+                .filter(comment -> comment.getUser().getId() == user.getId()) // Komentari korisnika
+                .filter(comment -> comment.getCreationDateTime()
+                        .atZone(ZoneId.systemDefault())
+                        .toInstant()
+                        .isAfter(oneHourAgo)) // Komentari u poslednjih sat vremena
+                .collect(Collectors.toList());
+
+        // Ako korisnik ima više od 60 komentara u poslednjih sat vremena, vraćamo false
+        return recentComments.size() < 15;
+    }
+
 
 
 

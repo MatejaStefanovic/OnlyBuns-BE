@@ -11,6 +11,9 @@ import org.onlybuns.enums.UserRole;
 import java.util.HashSet;
 import java.util.Set;
 
+import java.time.LocalDateTime;
+import java.util.Date;
+
 @Entity
 @Table(name = "users")
 public class User {
@@ -71,11 +74,14 @@ public class User {
 
     @Enumerated(EnumType.STRING)  // Store the enum as a string in the database
     private UserRole role;
+
+    private Date lastActivity;
+    private LocalDateTime lastCheckedStatistics;
     
     public User() {
     }
 
-    public User(UserRole role, Location location, boolean isActivated, String email, String lastName, String firstName, String password, String username, Integer numberOfFollowing, Integer numberOfPosts, Integer numberOfFollowers, Set<User> followers ) {
+    public User(UserRole role, Location location, boolean isActivated, String email, String lastName, String firstName, String password, String username, Integer numberOfFollowing, Integer numberOfPosts, Integer numberOfFollowers, Set<User> followers, Date lastActivity, LocalDateTime lastCheckedStatistics ) {
         this.role = role;
         this.location = location;
         this.isActivated = isActivated;
@@ -88,6 +94,8 @@ public class User {
         this.numberOfPosts = numberOfPosts;
         this.numberOfFollowers = numberOfFollowers;
         this.followers = followers;
+        this.lastActivity = lastActivity;
+        this.lastCheckedStatistics = lastCheckedStatistics;
     }
 
     public Set<User> getFollowers() {
@@ -183,5 +191,21 @@ public class User {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public Date getLastActivity() {
+        return lastActivity;
+    }
+
+    public void setLastActivity(Date lastActivity) {
+        this.lastActivity = lastActivity;
+    }
+
+    public LocalDateTime getLastCheckedStatistics() {
+        return lastCheckedStatistics;
+    }
+
+    public void setLastCheckedStatistics(LocalDateTime lastCheckedStatistics) {
+        this.lastCheckedStatistics = lastCheckedStatistics;
     }
 }

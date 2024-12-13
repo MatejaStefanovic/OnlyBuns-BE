@@ -1,5 +1,7 @@
 package org.onlybuns.security;
 
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.onlybuns.exceptions.UserRegistration.*;
@@ -11,6 +13,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+
+import java.util.Date;
 
 
 @Service
@@ -51,7 +55,10 @@ public class AuthenticationService {
         logger.info("User {} logged in successfully.", email);
 
         // Generate JWT token and return it
-        return tokenProvider.generateToken(user.getEmail());
+         return tokenProvider.generateToken(user.getEmail());
+
+
+
     }
 
 
@@ -80,5 +87,6 @@ public class AuthenticationService {
     public String getEmailFromJWT(String token) {
         return tokenProvider.getSubjectFromJWT(token);
     }
+
 }
 
