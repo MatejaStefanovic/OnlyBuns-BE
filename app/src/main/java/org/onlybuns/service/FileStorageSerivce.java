@@ -7,15 +7,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Base64;
 
 @Service
-public class FileStorageSerivce2 {
+public class FileStorageSerivce {
 
     private final Path fileStorageLocation;
 
@@ -24,7 +22,7 @@ public class FileStorageSerivce2 {
     private ImageRepository imageRepository;
 
     @Autowired
-    public FileStorageSerivce2(FileStorageProperties fileStorageProperties) {
+    public FileStorageSerivce(FileStorageProperties fileStorageProperties) {
         this.fileStorageLocation = Paths.get(fileStorageProperties.getUploadDir())
                 .toAbsolutePath().normalize();
         try {

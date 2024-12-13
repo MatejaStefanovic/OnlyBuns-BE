@@ -58,7 +58,8 @@ public class UserLoginController {
             	    user.getEmail(),              
             	    user.isActivated(),          
             	    new LocationDTO(user.getLocation()),      
-            	    user.getRole().name()                
+            	    user.getRole().name()
+
             );
             AuthResponseDTO authResponseDTO = new AuthResponseDTO(JWT,  userDTO);
             return new ResponseEntity<>(authResponseDTO, HttpStatus.OK);

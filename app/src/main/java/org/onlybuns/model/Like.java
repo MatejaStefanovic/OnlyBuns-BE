@@ -2,6 +2,10 @@ package org.onlybuns.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import org.springframework.cglib.core.Local;
+
+import java.time.LocalDateTime;
+
 @Entity
 @Table(name = "likes")
 public class Like {
@@ -19,11 +23,14 @@ public class Like {
     @JoinColumn(name = "user_id", nullable = true) // Optional relationship to the user who commented
     private User user;
 
+    private LocalDateTime creationDateTime;
+
      public Like(){}
 
-    public Like( User user, Post post) {
+    public Like(User user, Post post, LocalDateTime creationDateTime) {
         this.user = user;
         this.post = post;
+        this.creationDateTime = creationDateTime;
     }
 
     public User getUser() {
@@ -48,5 +55,13 @@ public class Like {
 
     public void setPost(Post post) {
         this.post = post;
+    }
+
+    public LocalDateTime getCreationDateTime() {
+        return creationDateTime;
+    }
+
+    public void setCreationDateTime(LocalDateTime creationDateTime) {
+        this.creationDateTime = creationDateTime;
     }
 }
