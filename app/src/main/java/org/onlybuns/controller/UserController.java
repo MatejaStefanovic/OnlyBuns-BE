@@ -15,7 +15,7 @@ public class UserController {
 
     private final UserService userService;
 
-    UserController(UserService userService){
+    UserController(UserService userService) {
         this.userService = userService;
     }
 
@@ -28,4 +28,25 @@ public class UserController {
             return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
         }
     }
+
+    @PutMapping("/follow")
+    public ResponseEntity<UserDTO> follow(@RequestParam("usernameFollower") String usernameFollower, @RequestParam("usernameFollowing") String usernameFollowing) {
+        try {
+            return new ResponseEntity<>(new UserDTO(userService.follow(usernameFollower,usernameFollowing)), HttpStatus.OK);
+        } catch (IllegalStateException e) {
+            e.printStackTrace();  // Log exception for more details
+            return new ResponseEntity<>(null, HttpStatus.TOO_MANY_REQUESTS);
+        }
+    }
+
+    @PutMapping("/unfollow")
+    public ResponseEntity<UserDTO> unfollow(@RequestParam("usernameFollower") String usernameFollower, @RequestParam("usernameFollowing") String usernameFollowing) {
+        try {
+            return new ResponseEntity<>(new UserDTO(userService.unfollow(usernameFollower,usernameFollowing)), HttpStatus.OK);
+        } catch (IllegalStateException e) {
+            e.printStackTrace();  // Log exception for more details
+            return new ResponseEntity<>(null, HttpStatus.TOO_MANY_REQUESTS);
+        }
+    }
+
 }
