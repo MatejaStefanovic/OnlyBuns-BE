@@ -5,6 +5,7 @@ import io.jsonwebtoken.Jwts;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.onlybuns.exceptions.UserRegistration.*;
+import org.onlybuns.exceptions.DoesNotExist.UsernameAlreadyExistsException;
 import org.onlybuns.model.User;
 import org.onlybuns.repository.UserRepository;
 import org.onlybuns.service.EmailService;
