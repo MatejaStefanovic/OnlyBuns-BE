@@ -3,7 +3,9 @@ package org.onlybuns.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
+import jakarta.validation.Valid;
 import org.hibernate.annotations.Parameter;
+import org.onlybuns.DTOs.LoginRequestDTO;
 import org.onlybuns.DTOs.PostCreationDTO;
 import org.onlybuns.exceptions.UserRegistration.UnauthorizedUserException;
 import org.onlybuns.model.Location;
@@ -74,4 +76,12 @@ public class PostController {
         List<Post> posts = postService.getAllPosts();
         return ResponseEntity.ok(posts);
     }
+
+    @GetMapping("/userPosts")
+    public ResponseEntity<List<Post>> getPostsFromUser(@RequestParam String email) throws IOException {
+        // Retrieve posts using the user's email
+        List<Post> posts = postService.getPostsFromUser(email);
+        return ResponseEntity.ok(posts);
+    }
+
 }

@@ -66,6 +66,10 @@ public class PostService {
         return postRepository.findAll();
     }
 
+    public List<Post> getPostsFromUser(String email) throws IOException {
+        User user = userRepository.findByEmail(email);
+        return postRepository.findAllByUser(user);
+    }
 
    public void deletePost(long postId){
        Post post = postRepository.findById(postId)
