@@ -3,6 +3,9 @@ package org.onlybuns.security;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import org.onlybuns.model.User;
+import org.onlybuns.repository.UserRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -20,15 +23,25 @@ public class TokenProvider {
     @Value("${app.jwt.expiration}")
     private long expirationTime;
 
+    @Autowired
+    private UserRepository userRepository;
+
+    public TokenProvider(UserRepository repository) {
+       this.userRepository = repository;
+    }
     // Generate JWT token from email
     public String generateToken(String email) {
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + expirationTime);
 
+        User user = userRepository.findByEmail(email);
+        user.setLastActivity(expiryDate);
+        userRepository.save(user);
+
         // Create a signing key from the secret
         SecretKey key = getSecretKey();
 
-        return Jwts.builder()
+       return  Jwts.builder()
                 .subject(email)
                 .issuedAt(new Date())
                 .expiration(expiryDate)
@@ -68,4 +81,23 @@ public class TokenProvider {
         }
         return false; // Token is invalid
     }
+
+    public Date getExpirationDateFromToken(String token) {
+        try {
+            SecretKey key = getSecretKey();
+            Claims claims = Jwts.parser()
+                    .setSigningKey(key)
+                    .build()
+                    .parseClaimsJws(token)
+                    .getBody();
+
+            return claims.getExpiration(); // Dohvatanje datuma isteka iz JWT-a
+        } catch (JwtException e) {
+            // Ako JWT nije validan, rukujte izuzecima po potrebi
+            System.out.println("Invalid JWT token: " + e.getMessage());
+            return null;
+        }
+    }
+
+
 }

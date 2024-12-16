@@ -51,7 +51,7 @@ public class PostInterController {
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-    @PostMapping("/{postId}/comment")
+   /* @PostMapping("/{postId}/comment")
     @Operation(summary = "Add a comment to a post")
     public ResponseEntity<Post> addComment(@PathVariable int postId, @RequestParam String username, @RequestParam String description) {
         try {
@@ -62,7 +62,33 @@ public class PostInterController {
         } catch (Exception e) {
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }*/
+
+    @PostMapping("/{postId}/comment")
+    @Operation(summary = "Add a comment to a post")
+    public ResponseEntity<Post> addComment(
+            @PathVariable int postId,
+            @RequestParam String username,
+            @RequestParam String description) {
+        try {
+            // Poziv servisa za dodavanje komentara
+            Post updatedPost = postService.addComment(postId, username, description);
+            return ResponseEntity.ok(updatedPost); // Vraćanje ažuriranog posta sa HTTP 200 OK
+        } catch (IllegalArgumentException e) {
+            // Ako post ili korisnik nisu pronađeni
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        } catch (IllegalStateException e) {
+            // Ako korisnik premaši limit za komentare
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+        } catch (UnauthorizedUserException e) {
+            // Ako korisnik nije autorizovan
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+        } catch (Exception e) {
+            // Sve ostale greške
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
     }
+
 
     @PostMapping("/{postId}/delete")
     @Operation(summary = "Delete post")
