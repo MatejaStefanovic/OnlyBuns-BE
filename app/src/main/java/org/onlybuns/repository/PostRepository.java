@@ -1,5 +1,6 @@
 package org.onlybuns.repository;
 
+import org.onlybuns.enums.UserRole;
 import org.onlybuns.model.Post;
 import org.onlybuns.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +12,6 @@ import java.util.List;
 
 @Repository
 public interface PostRepository extends JpaRepository<Post, Long> {
-
+    List<Post> findAllByUser(User user);
 }
 
