@@ -25,6 +25,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final AuthenticationService authenticationService;
     private final EmailService emailService;
+    private int a = 0;
 
     public UserService(UserRepository userRepository,AuthenticationService authenticationService, EmailService emailService) {
         this.userRepository = userRepository;
@@ -45,23 +46,25 @@ public class UserService {
         LOG.info("Follow method invoked for follower: {} and following: {}", usernameFollower, usernameFollowing);
         User user1 = findByUsername(usernameFollower);
         User user2 = userRepository.findByUsername(usernameFollowing);
-        try {
+       /* try {
             Thread.sleep(2000); // Pauza od 100ms
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             LOG.error("Thread interrupted", e);
-        }
+        }*/
+        a++;
         int number = user2.getNumberOfFollowers() + 1;
         user2.setNumberOfFollowers(number);
         user2.getFollowers().add(user1);
         user1.setNumberOfFollowing(user1.getNumberOfFollowing() + 1);
-
+        System.out.println("Rate limit  counter: " + a);
         userRepository.save(user1);
         return userRepository.save(user2);
     }
 
     public User followFallback(String usernameFollower, String usernameFollowing, RequestNotPermitted rnp) {
         LOG.warn("Too much follwings per minute for user: {}", usernameFollower);
+        a=0;
         System.out.println("Rate limit triggered for: " + usernameFollower);
         throw new IllegalStateException("You have reached your following limit per minute.", rnp);
 
@@ -72,12 +75,12 @@ public class UserService {
         User user1 = findByUsername(usernameFollower);
         User user2 = userRepository.findByUsername(usernameFollowing);
 
-       try {
+       /*try {
             Thread.sleep(2000); // Pauza od 100ms
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             LOG.error("Thread interrupted", e);
-        }
+        }*/
 
         int number = user2.getNumberOfFollowers()-1;
         user2.setNumberOfFollowers(number);
