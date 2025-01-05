@@ -80,6 +80,7 @@ public class PostController {
     @GetMapping("/userPosts")
     public ResponseEntity<List<Post>> getPostsFromUser(@RequestParam String email) throws IOException {
         // Retrieve posts using the user's email
+
         List<Post> posts = postService.getPostsFromUser(email);
         return ResponseEntity.ok(posts);
     }
