@@ -32,7 +32,12 @@ public class UserService {
         this.authenticationService = authenticationService;
         this.emailService = emailService;
     }
-
+    public long count(){
+        return userRepository.count();
+    }
+    public long countByNumberOfPostsGreaterThan(int number){
+           return userRepository.countByNumberOfPostsGreaterThan(0);
+    }
     public List<User> findAll() {
         return userRepository.findAllByRole(UserRole.NORMAL);
     }
