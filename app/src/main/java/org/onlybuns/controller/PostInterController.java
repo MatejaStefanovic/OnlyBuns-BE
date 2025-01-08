@@ -100,9 +100,14 @@ public class PostInterController {
             return ResponseEntity.ok(response);
     }
     @GetMapping("/all")
-    @Operation(summary = "Return list of users")
+    @Operation(summary = "Return list of posts")
     public ResponseEntity<List<Post>> getAll() throws IOException {
             return new ResponseEntity<List<Post>>( postService.getAllPosts(), HttpStatus.OK);
     }
 
+    @GetMapping("allFollowing")
+    @Operation(summary = "Return list of posts of users that are followed")
+    public ResponseEntity<List<Post>> getAllFollowing(@RequestParam("username")  String username) throws IOException {
+        return new ResponseEntity<List<Post>>( postService.getAllPostsFollowed(username), HttpStatus.OK);
+    }
 }
