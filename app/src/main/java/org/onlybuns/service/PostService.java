@@ -89,11 +89,15 @@ public class PostService {
 
 
     public List<Post> getPostsFromUser(String email) throws IOException {
-        User user = userRepository.findByEmail(email);
-        return postRepository.findAllByUser(user);
+        User user = userRepository.findByEmail(email); // Retrieve the user by email
+        return postRepository.findAll()
+                .stream()
+                .filter(post -> post.getUser().getId() == user.getId())
+                .collect(Collectors.toList());
     }
 
-   public void deletePost(long postId){
+
+    public void deletePost(long postId){
        Post post = postRepository.findById(postId)
                .orElseThrow(() -> new IllegalArgumentException("Post not found for ID: " + postId));
 
