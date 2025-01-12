@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -72,6 +73,23 @@ public class PostService {
     public List<Post> getAllPosts() throws IOException {
         return postRepository.findAll();
     }
+
+    public List<Post> getAllPostsFollowed(String loggedUsername) {
+        // Fetch all posts
+        List<Post> allPosts = postRepository.findAll(); // Ensure findAll() is implemented
+        List<Post> filteredPosts = new ArrayList<>();
+
+        // Filter posts by checking if loggedUsername exists in the followers list of the author
+        for (Post post : allPosts) {
+            boolean isFollower = post.getUser().getFollowers().stream()
+                    .anyMatch(follower -> follower.getUsername().equals(loggedUsername));
+            if (isFollower) {
+                filteredPosts.add(post);
+            }
+        }
+        return filteredPosts;
+    }
+
 
     public List<Post> getPostsFromUser(String email) throws IOException {
         User user = userRepository.findByEmail(email); // Retrieve the user by email

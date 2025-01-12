@@ -89,4 +89,20 @@ public class UserService {
         userRepository.save(user1);
         return userRepository.save(user2);
     }
+
+    @Scheduled(cron = "0 0 0 L * ?")
+   // @Scheduled(cron = "0 */10 * * * ?")
+    @Transactional
+    public void deleteInactiveAccounts() {
+        System.out.println("Pokretanje  brisanja neaktivnih naloga.");
+        List<User> inactiveUsers = userRepository.findInactiveUsers();
+
+        if (!inactiveUsers.isEmpty()) {
+            inactiveUsers.forEach(user -> System.out.println("Brisanje neaktivnog korisnika: "+ user.getUsername()));
+            userRepository.deleteAll(inactiveUsers);
+            System.out.println("Završeno brisanje neaktivnih naloga "+ inactiveUsers.size());
+        } else {
+            System.out.println("Nema neaktivnih naloga.");
+        }
+    }
 }
