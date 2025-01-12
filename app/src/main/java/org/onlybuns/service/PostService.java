@@ -18,6 +18,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+
 @Service
 public class PostService {
 
@@ -239,7 +242,18 @@ public class PostService {
         return recentComments.size() < 15;
     }
 
+    @Transactional
+    public List<Post> getTopFivePostsLastWeek() {
+        LocalDateTime sevenDaysAgo = LocalDateTime.now().minusDays(7);
+        Pageable pageable = PageRequest.of(0, 5); // Page 0, size 5
+        return postRepository.findTopFivePostsLastWeek(sevenDaysAgo, pageable);
+    }
 
+    @Transactional
+    public List<Post> getTopTenPostsAllTime() {
+        Pageable pageable = PageRequest.of(0, 10); // Page 0, size 10
+        return postRepository.findTopTenPostsAllTime(pageable);
+    }
 
 
 }
