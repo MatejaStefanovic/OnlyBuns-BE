@@ -52,7 +52,7 @@ public class UserActivityService {
 
             Date oneMinuteAgo = Date.from(Instant.now().minusSeconds(60)); // Pre 1 minut
 
-            if(user.getLastCheckedStatistics() == null) {
+
                 if (user.getLastActivity().before(oneMinuteAgo)) {
                     // Token je istekao pre više od 1 minuta
 
@@ -64,8 +64,8 @@ public class UserActivityService {
                     }
 
                 }
-            }
-            else{
+
+          /* else{
 
                 boolean uslo1 = user.getLastActivity().before(oneMinuteAgo);
                 boolean uslov2 = user.getLastCheckedStatistics().before(user.getLastActivity());
@@ -80,7 +80,7 @@ public class UserActivityService {
                     }
 
                 }
-            }
+            }*/
 
 
         }
@@ -95,56 +95,78 @@ public class UserActivityService {
         Date lastcheckedActivty = user.getLastCheckedStatistics();
         for (Post post : postService.getAllPosts()) {
             // Proveri da li je datum kreiranja posta pre jednog minuta
-            if (post.getCreationDateTime().isAfter(user.getLastActivity()
-                    .toInstant()
-                    .atZone(ZoneId.systemDefault())
-                    .toLocalDateTime()) && post.getUser().getId()!= user.getId()) {
-                count++;
+            if(user.getLastCheckedStatistics() == null){
+                if (post.getCreationDateTime().isAfter(user.getLastActivity()
+                        .toInstant()
+                        .atZone(ZoneId.systemDefault())
+                        .toLocalDateTime()) && post.getUser().getId()!= user.getId()) {
+                    count++;
+                }
             }
+            else{
+                if (post.getCreationDateTime().isAfter(user.getLastActivity()
+                        .toInstant()
+                        .atZone(ZoneId.systemDefault())
+                        .toLocalDateTime()) && post.getUser().getId()!= user.getId() && post.getCreationDateTime().isAfter(user.getLastCheckedStatistics()
+                        .toInstant()
+                        .atZone(ZoneId.systemDefault())
+                        .toLocalDateTime())) {
+                    count++;
+                }
+            }
+
         }
 
-        String likes = getNewLikes(user);
+        int likes = getNewLikes(user);
 
         // Kreiranje tela poruke sa rezultatom
-        if(count!=0 || !Objects.equals(likes, ""))
+        if(count!=0 || likes!=0)
         {
-            body = "User " + user.getUsername() + " has " + count + " new posts and" + likes + "new likes";
+            body = "User " + user.getUsername() + " has " + count + " new posts and " + likes + " new likes";
         }
 
         return body;
     }
 
 
-    public String getNewLikes(User user) throws IOException {
+    public int getNewLikes(User user) throws IOException {
 
-        String stringLike = "";
+        int likeNumbers = 0;
 
-
-       // List<Post> posts = postService.getPostsFromUser(user.getEmail());
         List<Like> likes = likeRepository.findAll();
 
-        List<Like> filteredLikes = likes.stream()
-                .filter(like -> {
-                    try {
-                        return postService.getPostsFromUser(user.getEmail()).stream().anyMatch(post -> like.getPost().getId() == post.getId());
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
-                })
-                .collect(Collectors.toList());
+        if(user.getLastCheckedStatistics() == null){
+            List<Like> newLikes = likes.stream()
+                    .filter(like -> like.getCreationDateTime().isAfter(user.getLastActivity().toInstant()
+                            .atZone(ZoneId.systemDefault())
+                            .toLocalDateTime()))
+                    .collect(Collectors.toList());
 
-        List<Like> newLikes = likes.stream()
-                .filter(like -> like.getCreationDateTime().isAfter(user.getLastActivity().toInstant()
-                        .atZone(ZoneId.systemDefault())
-                        .toLocalDateTime()))
-                .collect(Collectors.toList());
+            if(!newLikes.isEmpty()){
+                likeNumbers =  newLikes.size();
+            }
 
-        if(!newLikes.isEmpty()){
-            stringLike =  String.valueOf(newLikes.size());
+
+
+            return likeNumbers;
+        }
+        else{
+            List<Like> newLikes = likes.stream()
+                    .filter(like -> like.getCreationDateTime().isAfter(user.getLastCheckedStatistics().toInstant()
+                            .atZone(ZoneId.systemDefault())
+                            .toLocalDateTime()))
+                    .collect(Collectors.toList());
+
+            if(!newLikes.isEmpty()){
+                likeNumbers =  newLikes.size();
+            }
+
+
+            return likeNumbers;
         }
 
 
-        return stringLike;
+
     }
 
 
