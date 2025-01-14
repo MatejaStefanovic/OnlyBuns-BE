@@ -21,6 +21,16 @@ public class PostCreationDTO {
     private List<Comment> comments;
     private List<Like> likesList;
     private int likes;
+    private boolean suitableForAds;
+
+    public PostCreationDTO(String description, MultipartFile image, Location location, String email, boolean suitableForAds) {
+        this.description = description;
+        this.image = image;
+        this.location = location;
+        this.email = email;
+        this.suitableForAds = suitableForAds;
+
+    }
 
     public PostCreationDTO(String description, MultipartFile image, Location location, String email) {
         this.description = description;
@@ -28,6 +38,7 @@ public class PostCreationDTO {
         this.location = location;
         this.email = email;
     }
+
 
     public PostCreationDTO(String description, MultipartFile image, Location location, String email, int likes, List<Comment> c, List<Like> l) {
         this.description = description;
