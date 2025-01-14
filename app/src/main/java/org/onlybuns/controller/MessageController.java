@@ -20,8 +20,8 @@ public class MessageController {
     }
 
     @PostMapping
-    public String sendMessage(@RequestParam String description, @RequestParam String creationDateTime) {
-        messageSender.sendMessage(description, creationDateTime);
+    public String sendMessage(@RequestParam String description, @RequestParam String creationDateTime, @RequestParam String username) {
+        messageSender.sendMessage(description, creationDateTime, username);
         return "Poruka uspešno poslata!";
     }
 

@@ -15,9 +15,9 @@ public class MessageSender {
         this.rabbitTemplate = rabbitTemplate;
     }
 
-    public void sendMessage(String description, String creationDateTime) {
+    public void sendMessage(String description, String creationDateTime, String username) {
 
-        String jsonMessage = String.format("{\"description\": \"%s\", \"creationDateTime\": \"%s\"}", description, creationDateTime);
+        String jsonMessage = String.format("{\"description\": \"%s\", \"creationDateTime\": \"%s\", \"username\": \"%s\"}", description, creationDateTime, username);
         rabbitTemplate.convertAndSend("advertisement_fanout_exchange", "", jsonMessage);
         System.out.println("Poruka poslata: " + jsonMessage);
     }

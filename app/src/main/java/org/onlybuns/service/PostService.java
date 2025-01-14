@@ -58,7 +58,7 @@ public class PostService {
                 .orElseThrow(() -> new IllegalArgumentException("Post not found for ID: " + postId));
 
         post.setSuitableForAds(suitable);
-        messageSender.sendMessage(post.getDescription(),post.getCreationDateTime().toString());
+        messageSender.sendMessage(post.getDescription(),post.getCreationDateTime().toString(), post.getUser().getUsername());
         return postRepository.save(post);
     }
 
@@ -228,14 +228,6 @@ public class PostService {
         // Ako korisnik ima više od 60 komentara u poslednjih sat vremena, vraćamo false
         return recentComments.size() < 15;
     }
-
-
-    public boolean markAsSuitableForAds(long postId, String username)
-    {
-
-        return false;
-    }
-
 
 
 }
