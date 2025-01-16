@@ -24,4 +24,5 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     @Query("SELECT u FROM User u WHERE u.isActivated = false")
     List<User> findInactiveUsers();
+    long countByNumberOfPostsGreaterThan(int number);
 }

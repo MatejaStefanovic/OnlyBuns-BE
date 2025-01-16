@@ -8,14 +8,16 @@ import org.onlybuns.repository.LikeRepository;
 import org.onlybuns.repository.PostRepository;
 import org.onlybuns.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cglib.core.Local;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.ArrayList;
-import java.util.List;
+import java.time.temporal.WeekFields;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import org.springframework.data.domain.PageRequest;
@@ -69,6 +71,112 @@ public class PostService {
 
         return postRepository.save(post);
     }
+
+    public int getPostStatisticsYearly() {
+        List<Object[]> dailyPostCounts =    postRepository.getDailyPostCounts(LocalDateTime.now().minusYears(1), LocalDateTime.now());
+        Map<String, Long> yearlyCounts = new HashMap<>();
+
+        for (Object[] row : dailyPostCounts) {
+            Date d = (Date) row[0];
+            LocalDate date = ((java.sql.Date) d).toLocalDate();
+            long postCount = (long) row[1];
+            String year = String.valueOf(date.getYear());
+            yearlyCounts.put(year, yearlyCounts.getOrDefault(year, 0L) + postCount);
+        }
+
+        long sum = 0;
+        for (long count : yearlyCounts.values()) {
+            sum += count;
+        }
+        int totalMonths = yearlyCounts.size();
+        System.out.println("YEARLY: " + yearlyCounts);
+        return (int) Math.round((double) sum / totalMonths);
+    }
+
+
+
+    public int getPostStatisticsMonthly() {
+        List<Object[]> dailyPostCounts =    postRepository.getDailyPostCounts(LocalDateTime.now().minusMonths(3), LocalDateTime.now());
+        Map<String, Long> monthlyCounts = new HashMap<>();
+
+        for (Object[] row : dailyPostCounts) {
+            Date d = (Date) row[0];
+            LocalDate date = ((java.sql.Date) d).toLocalDate();
+            long postCount = (long) row[1];
+            int year = date.getYear();
+            int month = date.getMonthValue();
+            String yearMonth = year + "-" + String.format("%02d", month); //"GODINA-MJESEC"
+            monthlyCounts.put(yearMonth, monthlyCounts.getOrDefault(yearMonth, 0L) + postCount);
+        }
+        //dodavanje sedmica u kojim nema postova
+        LocalDate startDate = LocalDate.now().minusMonths(3);
+        LocalDate endDate = LocalDate.now();
+        LocalDate current = startDate;
+        while (!current.isAfter(endDate)) {
+            int year = current.getYear();
+            int month = current.getMonthValue();
+            String yearMonth = year + "-" + String.format("%02d", month);
+            monthlyCounts.putIfAbsent(yearMonth, 0L);
+            current = current.plusMonths(1);
+        }
+
+        System.out.println("DDDMONTH: " + monthlyCounts);
+        long sum = 0;
+        for (long count : monthlyCounts.values()) {
+            sum += count;
+        }
+        int totalMonths = monthlyCounts.size();
+        System.out.println("DDDMONTH: " + monthlyCounts);
+        return (int) Math.round((double) sum / totalMonths);
+    }
+
+    public int getPostStatisticsWeekly() {
+        List<Object[]> dailyPostCounts =    postRepository.getDailyPostCounts(LocalDateTime.now().minusMonths(3), LocalDateTime.now());
+        Map<String, Long> weeklyCounts = new HashMap<>();
+
+        for (Object[] row : dailyPostCounts) {
+            Date d = (Date) row[0];
+            LocalDate date = ((java.sql.Date) d).toLocalDate();
+           // LocalDate date = dateTime.toLocalDate();
+            long postCount = (long) row[1];
+            int year = date.getYear();
+            int week = date.get(WeekFields.of(Locale.getDefault()).weekOfYear());
+            String yearWeek = year + "-" + String.format("%02d", week); //"GODINA-SEDMICA"
+            weeklyCounts.put(yearWeek, weeklyCounts.getOrDefault(yearWeek, 0L) + postCount);
+        }
+ //dodavanje sedmica u kojim nema postova
+        LocalDate startDate = LocalDate.now().minusMonths(3);
+        LocalDate endDate = LocalDate.now();
+        LocalDate current = startDate;
+        while (!current.isAfter(endDate)) {
+            int year = current.getYear();
+            int week = current.get(WeekFields.of(Locale.getDefault()).weekOfYear());
+            String yearWeek = year + "-" + String.format("%02d", week);
+            weeklyCounts.putIfAbsent(yearWeek, 0L);
+            current = current.plusWeeks(1);
+        }
+
+        System.out.println("R: " + weeklyCounts);
+        long sum = 0;
+        for (long count : weeklyCounts.values()) {
+            sum += count;
+        }
+        int totalWeeks = weeklyCounts.size();
+        System.out.println("R: " + weeklyCounts);
+        return (int) Math.round((double) sum / totalWeeks);
+    }
+
+    /*public int getPostStatisticsWeekly(){
+        List<Object[]> weeklyPostCounts = postRepository.findWeeklyPostCounts(LocalDateTime.now().minusMonths(3), LocalDateTime.now());
+        int  sum=0;
+        int count=weeklyPostCounts.size();
+        for (Object[] row : weeklyPostCounts) {
+            String date = (String) row[0];
+            long postCount = (int) row[1];
+            sum += postCount;
+        }
+        return (int)sum/count;
+    }*/
 
     public List<Post> getAllPosts() throws IOException {
         return postRepository.findAll();

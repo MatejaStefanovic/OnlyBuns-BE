@@ -90,6 +90,27 @@ public class PostController {
         return ResponseEntity.ok(posts);
     }
 
+    @GetMapping("/weekly")
+    public ResponseEntity<Integer> getWeeklyStatistic() throws IOException {
+
+        int stat = postService.getPostStatisticsWeekly();
+        return ResponseEntity.ok(stat);
+    }
+
+    @GetMapping("/monthly")
+    public ResponseEntity<Integer> getMonthlyStatistic() throws IOException {
+
+        int stat = postService.getPostStatisticsMonthly();
+        return ResponseEntity.ok(stat);
+    }
+
+    @GetMapping("/yearly")
+    public ResponseEntity<Integer> getYearlyStatistic() throws IOException {
+
+        int stat = postService.getPostStatisticsYearly();
+        return ResponseEntity.ok(stat);
+    }
+
     @GetMapping("/trending/allTime")
     public ResponseEntity<List<Post>>  getTop10PostsAllTime() {
         List<Post> posts = postService.getTopTenPostsAllTime();
