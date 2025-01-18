@@ -68,7 +68,7 @@ public class User {
     private Integer version=0;
 
     @NotNull
-    @ManyToOne(cascade = CascadeType.PERSIST)
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "location_id")
     private Location location;
 
