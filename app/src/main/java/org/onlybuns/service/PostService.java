@@ -63,6 +63,8 @@ public class PostService {
         post.setCreationDateTime(LocalDateTime.now());
         User user = userRepository.findByEmail(postCreationDTO.getEmail());
         post.setUser(user);
+        user.setNumberOfPosts(user.getNumberOfPosts()+1);
+        userRepository.save(user);
         if (postCreationDTO.getImage() != null && !postCreationDTO.getImage().isEmpty()) {
             Image image = fileStorageService.storeFile(postCreationDTO.getImage());
             fileStorageService.getImageBase64ForImage(image);
