@@ -2,6 +2,8 @@ package org.onlybuns.service;
 
 import jakarta.transaction.Transactional;
 import org.onlybuns.DTOs.PostCreationDTO;
+import org.onlybuns.DTOs.PostDTO;
+import org.onlybuns.DTOs.UserDTO;
 import org.onlybuns.model.*;
 import org.onlybuns.repository.CommentRepository;
 import org.onlybuns.repository.LikeRepository;
@@ -181,7 +183,12 @@ public class PostService {
     public List<Post> getAllPosts() throws IOException {
         return postRepository.findAll();
     }
-
+    public PostDTO toPostDTO(Post user) {
+        if (user == null) {
+            throw new RuntimeException("User not found or not authenticated");
+        }
+        return new PostDTO(user);
+    }
     public List<Post> getAllPostsFollowed(String loggedUsername) {
         // Fetch all posts
         List<Post> allPosts = postRepository.findAll(); // Ensure findAll() is implemented

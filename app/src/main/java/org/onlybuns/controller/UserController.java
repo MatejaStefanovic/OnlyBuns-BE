@@ -26,7 +26,7 @@ public class UserController {
         this.commentService = commentService;
     }
 
-    @GetMapping("/findUser")
+    /*@GetMapping("/findUser")
     public ResponseEntity<UserDTO> findByUsername(@RequestParam("username") String username) {
         try {
             return new ResponseEntity<>(new UserDTO(userService.findByUsername(username)), HttpStatus.OK);
@@ -34,9 +34,19 @@ public class UserController {
             e.printStackTrace();  // Log exception for more details
             return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
         }
+    }*/
+    @GetMapping("/findUser")
+    public ResponseEntity<UserDTO> findByUsername(@RequestParam("username") String username) {
+        try {
+            User user = userService.findByUsername(username);
+            return ResponseEntity.ok(userService.toUserDTO(user));
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
     }
 
-    @PutMapping("/follow")
+
+    /*@PutMapping("/follow")
     public ResponseEntity<UserDTO> follow(@RequestParam("usernameFollower") String usernameFollower, @RequestParam("usernameFollowing") String usernameFollowing) {
         try {
             return new ResponseEntity<>(new UserDTO(userService.follow(usernameFollower,usernameFollowing)), HttpStatus.OK);
@@ -54,7 +64,28 @@ public class UserController {
             e.printStackTrace();  // Log exception for more details
             return new ResponseEntity<>(null, HttpStatus.TOO_MANY_REQUESTS);
         }
+    }*/
+
+    @PutMapping("/follow")
+    public ResponseEntity<UserDTO> follow(@RequestParam("usernameFollower") String usernameFollower, @RequestParam("usernameFollowing") String usernameFollowing) {
+        try {
+            UserDTO followedUser = userService.toUserDTO(userService.follow(usernameFollower, usernameFollowing));
+            return ResponseEntity.ok(followedUser);
+        } catch (IllegalStateException e) {
+            return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS).body(null);
+        }
     }
+
+    @PutMapping("/unfollow")
+    public ResponseEntity<UserDTO> unfollow(@RequestParam("usernameFollower") String usernameFollower, @RequestParam("usernameFollowing") String usernameFollowing) {
+        try {
+            UserDTO unfollowedUser = userService.toUserDTO(userService.unfollow(usernameFollower, usernameFollowing));
+            return ResponseEntity.ok(unfollowedUser);
+        } catch (IllegalStateException e) {
+            return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS).body(null);
+        }
+    }
+
 
     @GetMapping("/analytics")
     public ResponseEntity<Map<String, Object>> getUserActivityPercentages() {

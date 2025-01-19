@@ -1,4 +1,5 @@
 package org.onlybuns.service;
+import org.onlybuns.DTOs.UserDTO;
 import org.onlybuns.enums.UserRole;
 import org.onlybuns.exceptions.Security.InvalidTokenException;
 import org.onlybuns.repository.UserRepository;
@@ -44,7 +45,24 @@ public class UserService {
 
     public User findByUsername(String username) { return userRepository.findByUsername(username); }
 
-    
+    public UserDTO getUserDTO(User user) {
+        return new UserDTO(user);
+    }
+
+
+    public UserDTO toUserDTO(User user) {
+        if (user == null) {
+            throw new RuntimeException("User not found or not authenticated");
+        }
+        return new UserDTO(user);
+    }
+    public UserDTO findUserDTOByUsername(String username) {
+        User user = userRepository.findByUsername(username);
+        if (user == null) {
+            throw new RuntimeException("User not found: " + username);
+        }
+        return getUserDTO(user);
+    }
     @Transactional
     @RateLimiter(name = "followLimiter", fallbackMethod = "followFallback")
     public User follow(String usernameFollower, String usernameFollowing) {

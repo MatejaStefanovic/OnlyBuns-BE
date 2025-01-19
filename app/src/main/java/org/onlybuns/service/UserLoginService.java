@@ -1,6 +1,7 @@
 package org.onlybuns.service;
 
 import jakarta.servlet.http.HttpServletRequest;
+import org.onlybuns.DTOs.UserDTO;
 import org.onlybuns.exceptions.Security.*;
 import org.onlybuns.exceptions.UserRegistration.*;
 import org.onlybuns.model.User;
@@ -27,6 +28,12 @@ public class UserLoginService {
         this.authenticationService = authenticationService;
     }
 
+    public UserDTO toUserDTO(User user) {
+        if (user == null) {
+            throw new RuntimeException("User not found or not authenticated");
+        }
+        return new UserDTO(user);
+    }
     public String loginUser(String email, String password) {
         // Call AuthenticationService to verify credentials and generate a JWT token
         String jwtToken = authenticationService.loginUser(email, password);
@@ -74,14 +81,14 @@ public class UserLoginService {
         }
     }
     
-    public User getUserByEmail(String email) {
+    public UserDTO getUserByEmail(String email) {
     	User user = userRepository.findByEmail(email);
     	if (user != null && user.isActivated()) {
-    		return user;
+            return toUserDTO(user);
     	} else
     		throw new UnauthorizedUserException("User is not verified");
     }
-    public User getCurrentUser() {
+    public UserDTO getCurrentUser() {
         // Izvlači token iz Authorization zaglavlja
         ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
         if (attributes != null) {
@@ -99,7 +106,8 @@ public class UserLoginService {
                 }
 
                 String email = authenticationService.getEmailFromJWT(token);
-                return userRepository.findByEmail(email);
+                User user = userRepository.findByEmail(email);
+                return toUserDTO(user);
             }
         }
         return null; // Vraća null ako nema validnog tokena

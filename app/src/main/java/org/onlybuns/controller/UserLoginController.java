@@ -42,7 +42,7 @@ public class UserLoginController {
             return new ResponseEntity<ResponseDTO>(new ResponseDTO(e.getMessage()), HttpStatus.BAD_REQUEST);
         }
     }
-
+/*
     @PostMapping("/login")
     @Operation(summary = "Login to the system", description = "Authenticate user using username and password")
     @ApiResponse(responseCode = "200", description = "User logged in successfully")
@@ -62,6 +62,24 @@ public class UserLoginController {
             return new ResponseEntity<>(new ResponseDTO(e.getMessage()), HttpStatus.UNAUTHORIZED);
         }
     }
+*/
+@PostMapping("/login")
+@Operation(summary = "Login to the system", description = "Authenticate user using username and password")
+@ApiResponse(responseCode = "200", description = "User logged in successfully")
+@ApiResponse(responseCode = "400", description = "Unauthorized user")
+@ApiResponse(responseCode = "401", description = "Invalid credentials")
+public ResponseEntity<Object> loginUser(@Valid @RequestBody LoginRequestDTO loginRequestDTO) {
+    try {
+        String jwt = userLoginService.loginUser(loginRequestDTO.getEmail(), loginRequestDTO.getPassword());
+        UserDTO userDTO = userLoginService.getUserByEmail(loginRequestDTO.getEmail());
+        AuthResponseDTO authResponseDTO = new AuthResponseDTO(jwt, userDTO);
+        return ResponseEntity.ok(authResponseDTO);
+    } catch (InvalidCredentialsException e) {
+        return ResponseEntity.badRequest().body(new ResponseDTO(e.getMessage()));
+    } catch (UnauthorizedUserException e) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ResponseDTO(e.getMessage()));
+    }
+}
 
     @GetMapping("/activate")
     public ResponseEntity<String> activateUser(@RequestParam("token") String token) {

@@ -61,8 +61,7 @@ public class User {
     )
     private Set<User> followers = new HashSet<>();
 
-    @ManyToMany(mappedBy = "followers")
-    private Set<User> following = new HashSet<>();
+
 
     @Version
     private Integer version=0;

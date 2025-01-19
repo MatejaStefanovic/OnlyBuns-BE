@@ -3,6 +3,7 @@ package org.onlybuns.DTOs;
 import org.onlybuns.model.User;
 
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public class UserDTO {
 	
@@ -16,7 +17,7 @@ public class UserDTO {
     private int numberOfPosts = 0;
     private int numberOfFollowing = 0;
     private int numberOfFollowers =0;
-    private Set<User> followers;
+    private Set<String> followers;
 
     public UserDTO(String username, String firstName, String lastName, String email, boolean isActivated, LocationDTO location, String role) {
         this.username = username;
@@ -38,13 +39,15 @@ public class UserDTO {
         this.numberOfFollowers=user.getNumberOfFollowers();
         this.numberOfFollowing= user.getNumberOfFollowing();
         this.numberOfPosts= user.getNumberOfPosts();
-        this.followers=user.getFollowers();
+        this.followers = user.getFollowers().stream()
+                .map(User::getUsername)
+                .collect(Collectors.toSet());
 
     }
 
 
 
-    public void setFollowers(Set<User> followers) {
+    public void setFollowers(Set<String> followers) {
         this.followers = followers;
     }
 
@@ -57,7 +60,7 @@ public class UserDTO {
         return numberOfFollowers;
     }
 
-    public Set<User> getFollowers() {
+    public Set<String> getFollowers() {
         return followers;
     }
 

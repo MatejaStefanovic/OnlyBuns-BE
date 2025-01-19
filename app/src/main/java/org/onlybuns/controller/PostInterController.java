@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import org.hibernate.annotations.Parameter;
 import org.onlybuns.DTOs.PostCreationDTO;
+import org.onlybuns.DTOs.PostDTO;
 import org.onlybuns.exceptions.UserRegistration.UnauthorizedUserException;
 import org.onlybuns.model.Location;
 import org.onlybuns.model.Post;
@@ -24,6 +25,7 @@ import java.time.format.DateTimeParseException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/posts")
@@ -39,6 +41,7 @@ public class PostInterController {
 
 
    /* @Transactional*/
+    /*
     @PostMapping("/{postId}/like")
     @Operation(summary = "Add a like to a post")
     public ResponseEntity<Post> addLike(@PathVariable int postId, @RequestParam String username,  @RequestParam int flag) {
@@ -63,7 +66,7 @@ public class PostInterController {
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }*/
-
+/*
     @PostMapping("/{postId}/comment")
     @Operation(summary = "Add a comment to a post")
     public ResponseEntity<Post> addComment(
@@ -109,5 +112,62 @@ public class PostInterController {
     @Operation(summary = "Return list of posts of users that are followed")
     public ResponseEntity<List<Post>> getAllFollowing(@RequestParam("username")  String username) throws IOException {
         return new ResponseEntity<List<Post>>( postService.getAllPostsFollowed(username), HttpStatus.OK);
+    }**/
+
+    @PostMapping("/{postId}/like")
+    @Operation(summary = "Add a like to a post")
+    public ResponseEntity<PostDTO> addLike(@PathVariable int postId, @RequestParam String username, @RequestParam int flag) {
+        try {
+            PostDTO updatedPostDTO = new PostDTO(postService.addLike(postId, username, flag));
+            return ResponseEntity.ok(updatedPostDTO);
+        } catch (UnauthorizedUserException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
+
+    @PostMapping("/{postId}/comment")
+    @Operation(summary = "Add a comment to a post")
+    public ResponseEntity<PostDTO> addComment(@PathVariable int postId, @RequestParam String username, @RequestParam String description) {
+        try {
+            PostDTO updatedPostDTO = new PostDTO(postService.addComment(postId, username, description));
+            return ResponseEntity.ok(updatedPostDTO);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        } catch (IllegalStateException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+        } catch (UnauthorizedUserException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
+
+    @PostMapping("/{postId}/delete")
+    @Operation(summary = "Delete post")
+    public ResponseEntity<Map<String, String>> deletePost(@PathVariable int postId) {
+        postService.deletePost(postId);
+        Map<String, String> response = new HashMap<>();
+        response.put("message", "Deleted");
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/all")
+    @Operation(summary = "Return list of posts")
+    public ResponseEntity<List<PostDTO>> getAll() throws IOException {
+        List<PostDTO> postDTOs = postService.getAllPosts().stream()
+                .map(PostDTO::new)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(postDTOs);
+    }
+
+    @GetMapping("/allFollowing")
+    @Operation(summary = "Return list of posts of users that are followed")
+    public ResponseEntity<List<PostDTO>> getAllFollowing(@RequestParam("username") String username) throws IOException {
+        List<PostDTO> postDTOs = postService.getAllPostsFollowed(username).stream()
+                .map(PostDTO::new)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(postDTOs);
     }
 }
