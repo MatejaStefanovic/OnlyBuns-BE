@@ -46,6 +46,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/comment/weekly").permitAll()
                         .requestMatchers("/api/comment/monthly").permitAll()
                         .requestMatchers("/api/comment/yearly").permitAll()
+                        .requestMatchers("/api/admin/users").permitAll()
                         .requestMatchers("/api/post/userPosts").permitAll()
                         .requestMatchers("/api/users/findUser").permitAll()
                         .requestMatchers("/api/users/analytics").permitAll()

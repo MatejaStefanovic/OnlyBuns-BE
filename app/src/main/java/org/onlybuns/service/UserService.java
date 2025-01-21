@@ -60,7 +60,7 @@ public class UserService {
         a++;
         int number = user2.getNumberOfFollowers() + 1;
         user2.setNumberOfFollowers(number);
-        user2.getFollowers().add(user1);
+        user2.getFollowers().add(user1.getUsername());
         user1.setNumberOfFollowing(user1.getNumberOfFollowing() + 1);
         System.out.println("Rate limit  counter: " + a);
         userRepository.save(user1);
