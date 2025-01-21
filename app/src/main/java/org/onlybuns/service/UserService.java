@@ -89,7 +89,7 @@ public class UserService {
 
         int number = user2.getNumberOfFollowers()-1;
         user2.setNumberOfFollowers(number);
-        user2.getFollowers().remove(user1);
+        user2.getFollowers().remove(user1.getUsername());
         user1.setNumberOfFollowing(user1.getNumberOfFollowing()-1);
         userRepository.save(user1);
         return userRepository.save(user2);
