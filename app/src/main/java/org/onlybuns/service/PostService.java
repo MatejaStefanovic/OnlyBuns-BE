@@ -192,7 +192,7 @@ public class PostService {
         // Filter posts by checking if loggedUsername exists in the followers list of the author
         for (Post post : allPosts) {
             boolean isFollower = post.getUser().getFollowers().stream()
-                    .anyMatch(follower -> follower.getUsername().equals(loggedUsername));
+                    .anyMatch(follower -> follower.equals(loggedUsername));
             if (isFollower) {
                 filteredPosts.add(post);
             }
