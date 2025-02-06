@@ -32,6 +32,7 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.cors(Customizer.withDefaults())
                 .csrf(csrf -> csrf.disable())
+                .sessionManagement(session -> session.disable())
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/user/register").permitAll()
                         .requestMatchers("/api/user/activate").permitAll()
@@ -50,6 +51,8 @@ public class SecurityConfig {
                         .requestMatchers("/api/post/userPosts").permitAll()
                         .requestMatchers("/api/users/findUser").permitAll()
                         .requestMatchers("/api/users/analytics").permitAll()
+                        .requestMatchers("/api/users/following").permitAll()
+                        .requestMatchers("/socket/**").permitAll()
                         .requestMatchers("/api/user/register", "/api/user/activate", "/api/user/login").permitAll()
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-resources/**", "/webjars/**", "/swagger-ui.html").permitAll()
                         .anyRequest().authenticated()
@@ -75,3 +78,4 @@ public class SecurityConfig {
         };
     }
 }
+

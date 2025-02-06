@@ -1,5 +1,6 @@
 package org.onlybuns.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 
@@ -20,16 +21,18 @@ public class Message {
     @NotNull
     private String content;
 
-    private LocalDateTime time;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
+    @Column(name = "date_time", nullable = false)
+    private LocalDateTime dateTime;
 
     private boolean isRead;
 
-    public Message(int id, String receiverUsername, String senderUsername, String content, LocalDateTime time, boolean isRead) {
+    public Message(int id, String receiverUsername, String senderUsername, String content, LocalDateTime dateTime, boolean isRead) {
         this.id = id;
         this.receiverUsername = receiverUsername;
         SenderUsername = senderUsername;
         this.content = content;
-        this.time = time;
+        this.dateTime = dateTime;
         this.isRead = isRead;
     }
 
@@ -66,11 +69,11 @@ public class Message {
     }
 
     public LocalDateTime getTime() {
-        return time;
+        return dateTime;
     }
 
-    public void setTime(LocalDateTime time) {
-        this.time = time;
+    public void setTime(LocalDateTime dateTime) {
+        this.dateTime = dateTime;
     }
 
     public boolean isRead() {

@@ -4,6 +4,7 @@ package org.onlybuns.controller;
 import org.onlybuns.model.GroupChat;
 import org.onlybuns.model.Message;
 import org.onlybuns.repository.GroupChatRepository;
+import org.onlybuns.service.MessageService;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.stereotype.Controller;
@@ -17,9 +18,12 @@ import org.springframework.web.bind.annotation.RestController;
 public class MessageController {
     private final SimpMessagingTemplate messagingTemplate;
     private final GroupChatRepository groupChatRepository;
-    public MessageController(SimpMessagingTemplate messagingTemplate, GroupChatRepository groupChatRepository) {
+
+    private final MessageService messageService;
+    public MessageController(SimpMessagingTemplate messagingTemplate, GroupChatRepository groupChatRepository, MessageService messageService) {
         this.messagingTemplate = messagingTemplate;
         this.groupChatRepository = groupChatRepository;
+        this.messageService = messageService;
     }
 
     //Grupni chat
@@ -32,6 +36,7 @@ public class MessageController {
         if (group != null && group.getMembers().contains(message.getSenderUsername())) {
             String destination = "/group/" + message.getReceiverUsername();
             messagingTemplate.convertAndSend(destination, message);
+            messageService.save(message);
         } else {
             System.out.println("Group not found or sender is not a member.");
         }
@@ -44,6 +49,7 @@ public class MessageController {
             String destination = "/user/" + message.getReceiverUsername() + "/queue/messages";
             System.out.println("Privatna poruka za: " + message.getReceiverUsername());
             messagingTemplate.convertAndSend(destination, message);
+            messageService.save(message);
         }
     }
 
