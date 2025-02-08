@@ -3,15 +3,17 @@ package org.onlybuns.controller;
 
 import org.onlybuns.model.GroupChat;
 import org.onlybuns.model.Message;
+import org.onlybuns.model.Post;
 import org.onlybuns.repository.GroupChatRepository;
 import org.onlybuns.service.MessageService;
+import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.stereotype.Controller;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @Controller
 @CrossOrigin(origins = "http://localhost:3000")
@@ -37,6 +39,9 @@ public class MessageController {
             String destination = "/group/" + message.getReceiverUsername();
             messagingTemplate.convertAndSend(destination, message);
             messageService.save(message);
+
+            String senderFeedbackDestination = "/user/" + message.getSenderUsername() + "/queue/feedback";
+            messagingTemplate.convertAndSend(senderFeedbackDestination, "Message delivered successfully!");
         } else {
             System.out.println("Group not found or sender is not a member.");
         }
@@ -48,6 +53,9 @@ public class MessageController {
         if (message.getReceiverUsername() != null) {
             String destination = "/user/" + message.getReceiverUsername() + "/queue/messages";
             System.out.println("Privatna poruka za: " + message.getReceiverUsername());
+            System.out.println("Privatna poruka naa: " + destination);
+            System.out.println("poruka glasi: " + message.getContent());
+            System.out.println("poruka od: " + message.getSenderUsername());
             messagingTemplate.convertAndSend(destination, message);
             messageService.save(message);
         }

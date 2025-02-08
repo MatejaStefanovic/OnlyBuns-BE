@@ -82,9 +82,14 @@ public class UserController {
         List<String> followings = new ArrayList<>();
         users.remove(user);
         for (User u : users){
-            if( u.getFollowers().contains(user.getUsername())){
+            boolean isFollower = u.getFollowers().stream()
+                    .anyMatch(follower -> follower.equals(user.getUsername()));
+            if (isFollower) {
                 followings.add(u.getUsername());
             }
+           /* if( u.getFollowers().contains(user.getUsername())){
+                followings.add(u.getUsername());
+            }*/
         }
         return new ResponseEntity<>(followings, HttpStatus.OK);
     }

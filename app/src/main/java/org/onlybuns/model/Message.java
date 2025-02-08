@@ -1,6 +1,7 @@
 package org.onlybuns.model;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 
@@ -15,7 +16,8 @@ public class Message {
     private int id;
 
     @NotNull
-    private String SenderUsername;
+    @JsonProperty("senderUsername")
+    private String senderUsername;
     @NotNull
     private String receiverUsername;
     @NotNull
@@ -27,21 +29,24 @@ public class Message {
 
     private boolean isRead;
 
+    public Message(){
+
+    }
     public Message(int id, String receiverUsername, String senderUsername, String content, LocalDateTime dateTime, boolean isRead) {
         this.id = id;
         this.receiverUsername = receiverUsername;
-        SenderUsername = senderUsername;
+        this.senderUsername = senderUsername;
         this.content = content;
         this.dateTime = dateTime;
         this.isRead = isRead;
     }
 
     public @NotNull String getSenderUsername() {
-        return SenderUsername;
+        return senderUsername;
     }
 
     public void setSenderUsername(@NotNull String senderUsername) {
-        SenderUsername = senderUsername;
+        this.senderUsername = senderUsername;
     }
 
     public int getId() {
@@ -81,6 +86,6 @@ public class Message {
     }
 
     public void setRead(boolean read) {
-        isRead = read;
+        this.isRead = read;
     }
 }
