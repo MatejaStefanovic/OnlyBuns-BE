@@ -17,10 +17,18 @@ import java.util.Set;
 @Repository
 public interface MessageRepository extends JpaRepository<Message, Long> {
 
-    List<Message> findAllByReceiverUsername(String receiver);
+  //  List<Message> findAllByReceiverUsername(String receiver);
+  @Query("SELECT m FROM Message m WHERE m.receiverUsername = :receiver OR m.senderUsername = :receiver")
+  List<Message> findAllChats(@Param("receiver") String receiver);
 
     @Query("SELECT m FROM Message m WHERE m.receiverUsername = :receiver AND m.senderUsername = :sender  ORDER BY  m.dateTime DESC LIMIT 1")
     Message FindLastMessage(@Param("sender") String sender, @Param("receiver") String receiver);
-//Message findTopBySenderUsernameAndReceiverUsernameOrderByTimeDesc(String sender, String receiver);
+
+    @Query("SELECT m FROM Message m WHERE ( m.receiverUsername = :receiver AND m.senderUsername = :sender ) OR ( m.receiverUsername = :sender AND m.senderUsername = :receiver) ORDER BY  m.dateTime ASC")
+    List<Message> FindPreviousMEssages(@Param("sender") String sender, @Param("receiver") String receiver);
+
+    @Query("SELECT m FROM Message m WHERE m.receiverUsername = :receiver AND m.senderUsername = :sender")
+    List<Message> findAllReceivedFromUser(@Param("sender") String sender, @Param("receiver") String receiver);
+
 
 }

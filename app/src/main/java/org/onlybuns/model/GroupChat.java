@@ -16,21 +16,18 @@ public class GroupChat {
     private String groupName;
     private String admin;
 
-    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
-    @JoinColumn(name = "image_id", referencedColumnName = "id")
-    private Image image;
 
     @ElementCollection
     @CollectionTable(name = "users_groupchat", joinColumns = @JoinColumn(name = "user_id"))
     @Column(name = "member_username")
     private Set<String> members = new HashSet<>();
 
-    public GroupChat(int id, String groupName, String admin, Set<String> members, Image image) {
+    public GroupChat(int id, String groupName, String admin, Set<String> members) {
         this.id = id;
         this.groupName = groupName;
         this.admin = admin;
         this.members = members;
-        this.image = image;
+
     }
 
     public int getId() {
@@ -61,13 +58,7 @@ public class GroupChat {
         return members;
     }
 
-    public Image getImage() {
-        return image;
-    }
 
-    public void setImage(Image image) {
-        this.image = image;
-    }
 
     public void setMembers(Set<String> members) {
         this.members = members;

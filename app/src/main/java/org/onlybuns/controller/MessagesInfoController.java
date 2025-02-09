@@ -1,5 +1,6 @@
 package org.onlybuns.controller;
 
+import org.onlybuns.model.GroupChat;
 import org.onlybuns.model.Message;
 import org.onlybuns.repository.GroupChatRepository;
 import org.onlybuns.service.MessageService;
@@ -36,4 +37,19 @@ public class MessagesInfoController {
         return ResponseEntity.ok(m);
     }
 
+    @GetMapping("/previousMessages")
+    public ResponseEntity<List<Message>> getPreviousMessages(@RequestParam("sender") String sender, @RequestParam("receiver") String receiver){
+        List<Message> m = messageService.getPreviousMessages(sender, receiver);
+        return ResponseEntity.ok(m);
+    }
+    @PostMapping("/read")
+    public ResponseEntity<Boolean> markasRead(@RequestParam("sender") String sender, @RequestParam("receiver") String receiver){
+        messageService.markRead(sender, receiver);
+        return ResponseEntity.ok(true);
+    }
+    @PutMapping("/newGroup")
+    public ResponseEntity<GroupChat> newGroup(GroupChat group){
+        GroupChat g = groupChatRepository.save(group);
+        return ResponseEntity.ok(g);
+    }
 }

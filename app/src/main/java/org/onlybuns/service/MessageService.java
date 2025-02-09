@@ -33,9 +33,12 @@ public class MessageService {
                 .distinct()
                 .collect(Collectors.toList());
         return senders;*/
-        List<Message> msgs = messageRepository.findAllByReceiverUsername(username);
+        List<Message> msgs = messageRepository.findAllChats(username);
         for (Message m : msgs){
-            senders.add(m.getSenderUsername());
+            if(!m.getSenderUsername().equals( username)){
+            senders.add(m.getSenderUsername());}
+      else{
+                senders.add(m.getReceiverUsername());}
         }
         return senders;
 
@@ -43,5 +46,18 @@ public class MessageService {
 
     public Message getLastMessageSent (String sender, String receiver){
         return messageRepository.FindLastMessage(sender, receiver);
+    }
+
+    public List<Message> getPreviousMessages ( String sender, String receiver){
+        return messageRepository.FindPreviousMEssages(sender,receiver);
+    }
+
+    public void markRead ( String sender, String receiver) {
+        List<Message> mess = messageRepository.findAllReceivedFromUser(sender, receiver);
+        for (Message m : mess) {
+            m.setRead(true);
+            messageRepository.save(m);
+        }
+
     }
 }
