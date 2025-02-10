@@ -21,7 +21,11 @@ public interface MessageRepository extends JpaRepository<Message, Long> {
   @Query("SELECT m FROM Message m WHERE m.receiverUsername = :receiver OR m.senderUsername = :receiver")
   List<Message> findAllChats(@Param("receiver") String receiver);
 
-    @Query("SELECT m FROM Message m WHERE m.receiverUsername = :receiver AND m.senderUsername = :sender  ORDER BY  m.dateTime DESC LIMIT 1")
+  @Query("SELECT m FROM Message m WHERE m.receiverUsername = :receiver")
+  List<Message> findAllByReceiverUsername(@Param("receiver") String receiver);
+
+
+  @Query("SELECT m FROM Message m WHERE m.receiverUsername = :receiver AND m.senderUsername = :sender  ORDER BY  m.dateTime DESC LIMIT 1")
     Message FindLastMessage(@Param("sender") String sender, @Param("receiver") String receiver);
 
     @Query("SELECT m FROM Message m WHERE ( m.receiverUsername = :receiver AND m.senderUsername = :sender ) OR ( m.receiverUsername = :sender AND m.senderUsername = :receiver) ORDER BY  m.dateTime ASC")

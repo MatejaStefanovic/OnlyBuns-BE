@@ -52,6 +52,9 @@ public class MessageService {
         return messageRepository.FindPreviousMEssages(sender,receiver);
     }
 
+    public List<Message> getAllByReceiverUsername(String receiverUsername){
+        return messageRepository.findAllByReceiverUsername(receiverUsername);
+    }
     public void markRead ( String sender, String receiver) {
         List<Message> mess = messageRepository.findAllReceivedFromUser(sender, receiver);
         for (Message m : mess) {

@@ -22,6 +22,10 @@ public class GroupChat {
     @Column(name = "member_username")
     private Set<String> members = new HashSet<>();
 
+
+    public GroupChat(){
+        this.members = new HashSet<String>();
+    }
     public GroupChat(int id, String groupName, String admin, Set<String> members) {
         this.id = id;
         this.groupName = groupName;

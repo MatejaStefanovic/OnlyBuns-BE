@@ -30,18 +30,21 @@ public class MessageController {
 
     //Grupni chat
     @MessageMapping("/group/{groupId}")
+    @SendTo("/group/{groupId}")
     public void sendGroupMessage( Message message) {
 
         Long groupId = Long.valueOf(message.getReceiverUsername());
-        GroupChat group = groupChatRepository.findById(groupId).orElse(null);
+        GroupChat group = groupChatRepository.findByIdWithMembers(groupId).orElse(null);
 
-        if (group != null && group.getMembers().contains(message.getSenderUsername())) {
-            String destination = "/group/" + message.getReceiverUsername();
+        if (group != null && (  (group.getMembers().contains(message.getSenderUsername())) || (group.getAdmin().equals(message.getSenderUsername()))  )) {
+            String destination = "/topic/group/" + message.getReceiverUsername();
             messagingTemplate.convertAndSend(destination, message);
             messageService.save(message);
+            System.out.println("Grupna poruka za: " + group.getGroupName());
+            System.out.println("GRupna poruka naa: " + destination);
+            System.out.println("poruka glasi: " + message.getContent());
+            System.out.println("poruka od: " + message.getSenderUsername());
 
-            String senderFeedbackDestination = "/user/" + message.getSenderUsername() + "/queue/feedback";
-            messagingTemplate.convertAndSend(senderFeedbackDestination, "Message delivered successfully!");
         } else {
             System.out.println("Group not found or sender is not a member.");
         }

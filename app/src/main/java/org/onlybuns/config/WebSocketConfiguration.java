@@ -41,7 +41,7 @@ public class WebSocketConfiguration implements WebSocketMessageBrokerConfigurer 
 
 
         // Svaki URL bi pocinjao ovako: http://localhost:8080/socket-subscriber/…/…
-                .enableSimpleBroker("/socket-publisher", "/user"); // Definisanje topic-a (ruta) na koje klijenti mogu da se pretplate.
+                .enableSimpleBroker("/socket-publisher", "/user", "/topic"); // Definisanje topic-a (ruta) na koje klijenti mogu da se pretplate.
         registry.setUserDestinationPrefix("/user");// SimpleBroker cuva poruke u memoriji i salje ih klijentima na definisane topic-e.
         // Server kada salje poruke, salje ih na rute koje su ovde definisane, a klijenti cekaju na poruke.
         // Vise ruta odvajamo zarezom, npr. enableSimpleBroker("/ruta1", "/ruta2");

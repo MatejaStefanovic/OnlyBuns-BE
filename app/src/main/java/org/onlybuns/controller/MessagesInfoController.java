@@ -48,8 +48,24 @@ public class MessagesInfoController {
         return ResponseEntity.ok(true);
     }
     @PutMapping("/newGroup")
-    public ResponseEntity<GroupChat> newGroup(GroupChat group){
+    public ResponseEntity<GroupChat> newGroup(@RequestBody GroupChat group){
         GroupChat g = groupChatRepository.save(group);
         return ResponseEntity.ok(g);
     }
+    @GetMapping("/groupsForUser")
+    public ResponseEntity<List<GroupChat>> getGroupsForUser(@RequestParam("username") String username){
+        List<GroupChat> groups = groupChatRepository.findGroupsByMember(username);
+        List<GroupChat> additionalGroups = groupChatRepository.findAllByAdmin(username);
+        for (GroupChat g : additionalGroups){
+            groups.add(g);
+        }
+        return ResponseEntity.ok(groups);
+    }
+
+    @GetMapping("/groupMessages")
+    public ResponseEntity<List<Message>> getMessagesInGroupChat(@RequestParam("groupId") int groupId){
+        List<Message> m = messageService.getAllByReceiverUsername(String.valueOf(groupId));
+        return ResponseEntity.ok(m);
+    }
+
 }
