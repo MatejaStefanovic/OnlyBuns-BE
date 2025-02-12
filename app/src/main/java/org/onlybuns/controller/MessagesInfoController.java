@@ -1,6 +1,7 @@
 package org.onlybuns.controller;
 
 import org.onlybuns.model.GroupChat;
+import org.onlybuns.model.GroupMember;
 import org.onlybuns.model.Message;
 import org.onlybuns.repository.GroupChatRepository;
 import org.onlybuns.service.MessageService;
@@ -8,8 +9,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
+
+
 
 @RestController
 @RequestMapping("/api/mess")
@@ -48,7 +54,11 @@ public class MessagesInfoController {
         return ResponseEntity.ok(true);
     }
     @PutMapping("/newGroup")
-    public ResponseEntity<GroupChat> newGroup(@RequestBody GroupChat group){
+    public ResponseEntity<GroupChat> newGroup(@RequestBody GroupChat group, @RequestParam List<String> users){
+        for(String u : users){
+            GroupMember gm = new GroupMember(u);
+            group.getMembers().add(gm);
+        }
         GroupChat g = groupChatRepository.save(group);
         return ResponseEntity.ok(g);
     }
@@ -61,11 +71,64 @@ public class MessagesInfoController {
         }
         return ResponseEntity.ok(groups);
     }
-
+/*
     @GetMapping("/groupMessages")
-    public ResponseEntity<List<Message>> getMessagesInGroupChat(@RequestParam("groupId") int groupId){
+    public ResponseEntity<List<Message>> getMessagesInGroupChat(@RequestParam("groupId") int groupId,@RequestParam("username") String username){
         List<Message> m = messageService.getAllByReceiverUsername(String.valueOf(groupId));
         return ResponseEntity.ok(m);
+    }*/
+
+    @GetMapping("/groupMessages")
+    public ResponseEntity<List<Message>> getMessagesInGroupChat(
+            @RequestParam("groupId") int groupId,
+            @RequestParam("username") String username) {
+
+        GroupChat group = groupChatRepository.findByIdWithMembers((long) groupId).orElse(null);
+        if (group == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        GroupMember member = group.getMembers()
+                .stream()
+                .filter(m -> m.getMemberUsername().equals(username))
+                .findFirst()
+                .orElse(null);
+        if ((member==null) && group.getAdmin().equals(username)){
+            List<Message> m = messageService.getAllByReceiverUsername(String.valueOf(groupId));
+            return ResponseEntity.ok(m);
+        }
+        LocalDateTime joinDate = member.getJoinedAt();
+
+        List<Message> allMessages = messageService.getAllByReceiverUsername(String.valueOf(groupId));
+
+
+        List<Message> afterJoinDate = allMessages.stream()
+                .filter(msg -> msg.getTime().isAfter(joinDate))
+                .toList();
+
+        List<Message> beforeJoinDate = allMessages.stream()
+                .filter(msg -> msg.getTime().isBefore(joinDate))
+                .sorted(Comparator.comparing(Message::getTime).reversed()) // Sort descending
+                .limit(10) // Keep only last 10 messages before join date
+                .toList();
+        List<Message> finalMessages = new ArrayList<>();
+        finalMessages.addAll(beforeJoinDate);
+        finalMessages.addAll(afterJoinDate);
+        finalMessages = finalMessages.stream()
+                .sorted(Comparator.comparing(Message::getTime))
+                .toList();
+
+
+        return ResponseEntity.ok(finalMessages);
+    }
+
+    @GetMapping("/addMember")
+    public ResponseEntity<GroupChat> getMessagesInGroupChat(@RequestParam("username") String username, @RequestParam("groupId") Long groupId){
+        GroupChat group = groupChatRepository.findByIdWithMembers(groupId).orElse(null);
+        GroupMember gm = new GroupMember(username);
+        group.getMembers().add(gm);
+        GroupChat g= groupChatRepository.save(group);
+        return ResponseEntity.ok(g);
     }
 
 }

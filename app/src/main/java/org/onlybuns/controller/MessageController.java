@@ -36,7 +36,7 @@ public class MessageController {
         Long groupId = Long.valueOf(message.getReceiverUsername());
         GroupChat group = groupChatRepository.findByIdWithMembers(groupId).orElse(null);
 
-        if (group != null && (  (group.getMembers().contains(message.getSenderUsername())) || (group.getAdmin().equals(message.getSenderUsername()))  )) {
+        if (group != null && (  (group.getMembers().stream().anyMatch(member -> member.getMemberUsername().equals(message.getSenderUsername())))|| (group.getAdmin().equals(message.getSenderUsername()))  )) {
             String destination = "/topic/group/" + message.getReceiverUsername();
             messagingTemplate.convertAndSend(destination, message);
             messageService.save(message);

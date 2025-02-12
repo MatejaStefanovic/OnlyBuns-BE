@@ -16,17 +16,21 @@ public class GroupChat {
     private String groupName;
     private String admin;
 
-
+/*
     @ElementCollection
     @CollectionTable(name = "users_groupchat", joinColumns = @JoinColumn(name = "user_id"))
     @Column(name = "member_username")
     private Set<String> members = new HashSet<>();
+*/
 
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "group_id") // Creates a foreign key in `groupMembers`
+    private Set<GroupMember> members = new HashSet<>();
 
     public GroupChat(){
-        this.members = new HashSet<String>();
+        this.members = new HashSet<GroupMember>();
     }
-    public GroupChat(int id, String groupName, String admin, Set<String> members) {
+    public GroupChat(int id, String groupName, String admin, Set<GroupMember> members) {
         this.id = id;
         this.groupName = groupName;
         this.admin = admin;
@@ -58,13 +62,13 @@ public class GroupChat {
         this.admin = admin;
     }
 
-    public Set<String> getMembers() {
+    public Set<GroupMember> getMembers() {
         return members;
     }
 
 
 
-    public void setMembers(Set<String> members) {
+    public void setMembers(Set<GroupMember> members) {
         this.members = members;
     }
 }

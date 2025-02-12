@@ -10,11 +10,17 @@ import java.util.Optional;
 
 public interface GroupChatRepository extends JpaRepository<GroupChat, Long> {
 
-    @Query("SELECT g FROM GroupChat g JOIN g.members m WHERE m = :username")
-    List<GroupChat> findGroupsByMember(@Param("username") String username);
-    List<GroupChat> findAllByAdmin( String username);
+   // @Query("SELECT g FROM GroupChat g JOIN g.members m WHERE m = :username")
+  //  List<GroupChat> findGroupsByMember(@Param("username") String username);
+   @Query("SELECT g FROM GroupChat g JOIN g.members m WHERE m.memberUsername = :username")
+   List<GroupChat> findGroupsByMember(@Param("username") String username);
 
-    @Query("SELECT g FROM GroupChat g JOIN FETCH g.members WHERE g.id = :groupId")
+    List<GroupChat> findAllByAdmin( String username);
+/*
+  @Query("SELECT g FROM GroupChat g JOIN FETCH g.members WHERE g.id = :groupId")
+    Optional<GroupChat> findByIdWithMembers(@Param("groupId") Long groupId);*/
+
+    @Query("SELECT g FROM GroupChat g LEFT JOIN FETCH g.members WHERE g.id = :groupId")
     Optional<GroupChat> findByIdWithMembers(@Param("groupId") Long groupId);
 
 }
