@@ -13,6 +13,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Controller
@@ -39,6 +40,7 @@ public class MessageController {
         if (group != null && (  (group.getMembers().stream().anyMatch(member -> member.getMemberUsername().equals(message.getSenderUsername())))|| (group.getAdmin().equals(message.getSenderUsername()))  )) {
             String destination = "/topic/group/" + message.getReceiverUsername();
             messagingTemplate.convertAndSend(destination, message);
+            message.setTime(LocalDateTime.now());
             messageService.save(message);
             System.out.println("Grupna poruka za: " + group.getGroupName());
             System.out.println("GRupna poruka naa: " + destination);
@@ -60,6 +62,7 @@ public class MessageController {
             System.out.println("poruka glasi: " + message.getContent());
             System.out.println("poruka od: " + message.getSenderUsername());
             messagingTemplate.convertAndSend(destination, message);
+            message.setTime(LocalDateTime.now());
             messageService.save(message);
         }
     }

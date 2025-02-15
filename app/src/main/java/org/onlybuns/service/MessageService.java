@@ -37,9 +37,13 @@ public class MessageService {
         for (Message m : msgs){
             if(!m.getSenderUsername().equals( username)){
             senders.add(m.getSenderUsername());}
-      else{
-                senders.add(m.getReceiverUsername());}
-        }
+      else {
+                if (m.getReceiverUsername() != null && !m.getReceiverUsername().matches("\\d+")) {
+                    senders.add(m.getReceiverUsername());
+                }
+            }
+
+            }
         return senders;
 
     }
