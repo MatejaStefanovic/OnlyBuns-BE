@@ -6,9 +6,8 @@ import org.onlybuns.repository.MessageRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.time.LocalDateTime;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -27,12 +26,6 @@ public class MessageService {
 
     public Set<String> getAllSendersForUser(String username){
         Set<String> senders = new HashSet<>();
-       /* List<String> senders = messageRepository.findAllByReceiverUsername(username)
-                .stream()
-                .map(Message::getSenderUsername)
-                .distinct()
-                .collect(Collectors.toList());
-        return senders;*/
         List<Message> msgs = messageRepository.findAllChats(username);
         for (Message m : msgs){
             if(!m.getSenderUsername().equals( username)){
@@ -51,6 +44,9 @@ public class MessageService {
     public Message getLastMessageSent (String sender, String receiver){
         return messageRepository.FindLastMessage(sender, receiver);
     }
+    public Message getLastGroupMessageSent ( String receiver){
+        return messageRepository.FindLastGroupMessage( receiver);
+    }
 
     public List<Message> getPreviousMessages ( String sender, String receiver){
         return messageRepository.FindPreviousMEssages(sender,receiver);
@@ -66,5 +62,28 @@ public class MessageService {
             messageRepository.save(m);
         }
 
+    }
+
+
+    public List<Message> getGroupMessagesByJoiningDate(LocalDateTime joinDate, int groupId){
+        List<Message> allMessages = getAllByReceiverUsername(String.valueOf(groupId));
+
+
+        List<Message> afterJoinDate = allMessages.stream()
+                .filter(msg -> msg.getTime().isAfter(joinDate))
+                .toList();
+
+        List<Message> beforeJoinDate = allMessages.stream()
+                .filter(msg -> msg.getTime().isBefore(joinDate))
+                .sorted(Comparator.comparing(Message::getTime).reversed()) // Sort descending
+                .limit(10) // Keep only last 10 messages before join date
+                .toList();
+        List<Message> finalMessages = new ArrayList<>();
+        finalMessages.addAll(beforeJoinDate);
+        finalMessages.addAll(afterJoinDate);
+        finalMessages = finalMessages.stream()
+                .sorted(Comparator.comparing(Message::getTime))
+                .toList();
+        return finalMessages;
     }
 }
