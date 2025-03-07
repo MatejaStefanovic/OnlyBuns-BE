@@ -185,11 +185,11 @@ public class PostService {
     }
 
     public List<Post> getAllPostsFollowed(String loggedUsername) {
-        // Fetch all posts
-        List<Post> allPosts = postRepository.findAll(); // Ensure findAll() is implemented
+
+        List<Post> allPosts = postRepository.findAll();
         List<Post> filteredPosts = new ArrayList<>();
 
-        // Filter posts by checking if loggedUsername exists in the followers list of the author
+
         for (Post post : allPosts) {
             boolean isFollower = post.getUser().getFollowers().stream()
                     .anyMatch(follower -> follower.equals(loggedUsername));

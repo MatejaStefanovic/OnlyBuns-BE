@@ -9,7 +9,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -71,6 +73,25 @@ public class UserController {
 
         return ResponseEntity.ok(response);
 
+    }
+
+    @GetMapping("/following")
+    public ResponseEntity<List<String>> getAllFollowingsForUser(@RequestParam("username") String username){
+        User user = userService.findByUsername(username);
+        List<User> users = userService.findAll();
+        List<String> followings = new ArrayList<>();
+        users.remove(user);
+        for (User u : users){
+            boolean isFollower = u.getFollowers().stream()
+                    .anyMatch(follower -> follower.equals(user.getUsername()));
+            if (isFollower) {
+                followings.add(u.getUsername());
+            }
+           /* if( u.getFollowers().contains(user.getUsername())){
+                followings.add(u.getUsername());
+            }*/
+        }
+        return new ResponseEntity<>(followings, HttpStatus.OK);
     }
 
 }
