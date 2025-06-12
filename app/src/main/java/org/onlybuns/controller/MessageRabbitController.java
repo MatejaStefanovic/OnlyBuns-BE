@@ -1,6 +1,6 @@
 package org.onlybuns.controller;
 
-import org.onlybuns.component.MessageSender;
+import org.onlybuns.component.MessageRabbitSender;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -10,18 +10,18 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/messages")
-public class MessageController {
+public class MessageRabbitController {
 
-    private final MessageSender messageSender;
+    private final MessageRabbitSender messageRabbitSender;
 
     @Autowired
-    public MessageController(MessageSender messageSender) {
-        this.messageSender = messageSender;
+    public MessageRabbitController(MessageRabbitSender messageRabbitSender) {
+        this.messageRabbitSender = messageRabbitSender;
     }
 
     @PostMapping
     public String sendMessage(@RequestParam String description, @RequestParam String creationDateTime, @RequestParam String username) {
-        messageSender.sendMessage(description, creationDateTime, username);
+        messageRabbitSender.sendMessage(description, creationDateTime, username);
         return "Poruka uspešno poslata!";
     }
 

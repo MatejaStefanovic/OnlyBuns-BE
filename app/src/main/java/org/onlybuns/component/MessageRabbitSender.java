@@ -6,12 +6,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
-public class MessageSender {
+public class MessageRabbitSender {
 
     @Autowired
     private final RabbitTemplate rabbitTemplate;
 
-    public MessageSender(RabbitTemplate rabbitTemplate) {
+    public MessageRabbitSender(RabbitTemplate rabbitTemplate) {
         this.rabbitTemplate = rabbitTemplate;
     }
 

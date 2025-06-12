@@ -2,7 +2,7 @@ package org.onlybuns.service;
 
 import jakarta.transaction.Transactional;
 import org.onlybuns.DTOs.PostCreationDTO;
-import org.onlybuns.component.MessageSender;
+import org.onlybuns.component.MessageRabbitSender;
 import org.onlybuns.model.*;
 import org.onlybuns.repository.CommentRepository;
 import org.onlybuns.repository.LikeRepository;
@@ -26,16 +26,16 @@ public class PostService {
     private final FileStorageSerivce fileStorageService;
     private final LikeRepository likeRepository;
     private final CommentRepository commentRepository;
-    private final MessageSender messageSender;
+    private final MessageRabbitSender messageRabbitSender;
 
     @Autowired
-    public PostService(PostRepository postRepository, UserRepository userRepository, FileStorageSerivce fileStorageService, LikeRepository likeRepository, CommentRepository commentRepository, MessageSender messageSender) {
+    public PostService(PostRepository postRepository, UserRepository userRepository, FileStorageSerivce fileStorageService, LikeRepository likeRepository, CommentRepository commentRepository, MessageRabbitSender messageRabbitSender) {
         this.postRepository = postRepository;
         this.userRepository = userRepository;
         this.fileStorageService = fileStorageService;
         this.likeRepository = likeRepository;
         this.commentRepository = commentRepository;
-        this.messageSender = messageSender;
+        this.messageRabbitSender = messageRabbitSender;
     }
     public Post updatePost(Long postId, PostCreationDTO postDTO) throws IOException {
         Post post = postRepository.findById(postId)
@@ -58,7 +58,7 @@ public class PostService {
                 .orElseThrow(() -> new IllegalArgumentException("Post not found for ID: " + postId));
 
         post.setSuitableForAds(suitable);
-        messageSender.sendMessage(post.getDescription(),post.getCreationDateTime().toString(), post.getUser().getUsername());
+        messageRabbitSender.sendMessage(post.getDescription(),post.getCreationDateTime().toString(), post.getUser().getUsername());
         return postRepository.save(post);
     }
 

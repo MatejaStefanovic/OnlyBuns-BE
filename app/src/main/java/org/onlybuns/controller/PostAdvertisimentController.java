@@ -1,14 +1,11 @@
 package org.onlybuns.controller;
 
 
-import org.onlybuns.DTOs.PostCreationDTO;
-import org.onlybuns.component.MessageSender;
-import org.onlybuns.model.Location;
+import org.onlybuns.component.MessageRabbitSender;
 import org.onlybuns.service.PostService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -24,7 +21,7 @@ public class PostAdvertisimentController {
 
 
     @Autowired
-    public PostAdvertisimentController(PostService postService, MessageSender messageSender) {
+    public PostAdvertisimentController(PostService postService, MessageRabbitSender messageRabbitSender) {
         this.postService = postService;
 
     }
