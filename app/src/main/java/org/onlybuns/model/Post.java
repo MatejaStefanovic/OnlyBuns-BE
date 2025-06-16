@@ -23,8 +23,8 @@ public class Post {
     @JoinColumn(name = "image_id", referencedColumnName = "id")
     private Image image;
 
-    @ManyToOne(cascade = CascadeType.PERSIST)
-    @JoinColumn(name = "location_id")
+    @ManyToOne
+    @JoinColumn(name = "location_id", nullable = false)
     private Location location;
 
     @ManyToOne

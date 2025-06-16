@@ -12,6 +12,12 @@ public class LocationDTO {
     	this.street = location.getStreet();
     }
 
+    public LocationDTO(String country, String street, String city) {
+        this.country = country;
+        this.street = street;
+        this.city = city;
+    }
+
     public String getCountry() {
         return country;
     }
