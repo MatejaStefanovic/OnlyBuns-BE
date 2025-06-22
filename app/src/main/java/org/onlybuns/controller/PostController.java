@@ -54,7 +54,7 @@ public class PostController {
     }
 
 
-    @PutMapping(value = "/update/{postId}", consumes = {"multipart/form-data"})
+   /* @PutMapping(value = "/update/{postId}", consumes = {"multipart/form-data"})
     public ResponseEntity<Map<String, String>> updatePost(@PathVariable Long postId,
                                                           @RequestPart("description") String description,
                                                           @RequestPart("image") MultipartFile image,
@@ -63,6 +63,22 @@ public class PostController {
                                                           @RequestPart("street") String street,
                                                           @RequestPart("email") String email) throws IOException {
         PostCreationDTO postDTO = new PostCreationDTO(description, image, new Location(country, street, city), email);
+        postService.updatePost(postId, postDTO);
+
+        Map<String, String> response = new HashMap<>();
+        response.put("message", "Updated");
+        return ResponseEntity.ok(response);
+    }*/
+
+    @PutMapping(value = "/update/{postId}", consumes = {"multipart/form-data"})
+    public ResponseEntity<Map<String, String>> updatePost(@PathVariable Long postId,
+                                                          @RequestPart("description") String description,
+                                                          @RequestPart("image") MultipartFile image,
+                                                          @RequestParam BigDecimal latitude,
+                                                          @RequestParam BigDecimal longitude,
+                                                          @RequestPart("email") String email) throws IOException {
+        Location locationData = locationService.getLocationInfo(latitude, longitude);
+        PostCreationDTO postDTO = new PostCreationDTO(description, image, locationData , email);
         postService.updatePost(postId, postDTO);
 
         Map<String, String> response = new HashMap<>();

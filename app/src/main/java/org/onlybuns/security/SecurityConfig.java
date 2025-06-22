@@ -40,6 +40,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/posts/all").permitAll()
                         .requestMatchers("/api/advertisiment/posts/markForAds/**").permitAll()
                         .requestMatchers("/api/post/userPosts").permitAll()
+                        .requestMatchers("/api/post/**").permitAll()
                         .requestMatchers("/api/users/findUser").permitAll()
                         .requestMatchers("/api/user/register", "/api/user/activate", "/api/user/login").permitAll()
                         .requestMatchers("/api/messages").permitAll()

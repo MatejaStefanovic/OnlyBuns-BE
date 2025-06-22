@@ -42,6 +42,8 @@ public class LocationService {
         newCache.setCity(locationData.getCity());
         newCache.setCountry(locationData.getCountry());
         newCache.setStreet(locationData.getStreet());
+        newCache.setLatitude(lat);
+        newCache.setLongitude(lng);
 
         cacheRepository.save(newCache);
         System.out.println("Sačuvao u keš!");
