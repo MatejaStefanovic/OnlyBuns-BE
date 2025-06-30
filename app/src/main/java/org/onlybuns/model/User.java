@@ -75,7 +75,7 @@ public class User {
     public User() {
     }
 
-    public User(UserRole role, Location location, boolean isActivated, String email, String lastName, String firstName, String password, String username, Integer numberOfFollowing, Integer numberOfPosts, Integer numberOfFollowers, Set<User> followers, Date lastActivity, Date lastCheckedStatistics ) {
+    public User(UserRole role, Location location, boolean isActivated, String email, String lastName, String firstName, String password, String username, Integer numberOfFollowing, Integer numberOfPosts, Integer numberOfFollowers, Set<String> followers, Date lastActivity, Date lastCheckedStatistics ) {
         this.role = role;
         this.location = location;
         this.isActivated = isActivated;

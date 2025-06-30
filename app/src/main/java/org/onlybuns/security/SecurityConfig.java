@@ -55,6 +55,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/users/findUser").permitAll()
                         .requestMatchers("/api/users/analytics").permitAll()
                         .requestMatchers("/api/users/following").permitAll()
+                        .requestMatchers("/api/user/follow").permitAll()
                         .requestMatchers("/socket/**").permitAll()
                         .requestMatchers("/api/user/register", "/api/user/activate", "/api/user/login").permitAll()
                         .requestMatchers("/api/messages").permitAll()
