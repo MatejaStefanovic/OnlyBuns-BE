@@ -14,8 +14,8 @@ public class Like {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @ManyToOne
-    @JoinColumn(name = "post_id", nullable = false)
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "post_id")
     @JsonIgnore
     private Post post;
 
@@ -25,6 +25,8 @@ public class Like {
 
     private LocalDateTime creationDateTime;
 
+  // @Version
+   //private Integer version=0;
      public Like(){}
 
     public Like(User user, Post post, LocalDateTime creationDateTime) {
@@ -64,4 +66,12 @@ public class Like {
     public void setCreationDateTime(LocalDateTime creationDateTime) {
         this.creationDateTime = creationDateTime;
     }
+
+   /* public Integer getVersion() {
+        return version;
+    }
+
+    public void setVersion(Integer version) {
+        this.version = version;
+    }*/
 }

@@ -1,5 +1,6 @@
 package org.onlybuns.service;
 
+import jakarta.transaction.Transactional;
 import org.onlybuns.config.FileStorageProperties;
 import org.onlybuns.model.Image;
 import org.onlybuns.repository.ImageRepository;
@@ -31,9 +32,12 @@ public class FileStorageSerivce {
             throw new RuntimeException("Could not create the directory where the uploaded files will be stored.", ex);
         }
     }
+
+    @Transactional
     public String getImageBase64ForImage(Image image) throws IOException {
         return image.setImageBase64(fileStorageLocation.toString());
     }
+    @Transactional
     public Image storeFile(MultipartFile file) {
         String fileName = null;
         try {
