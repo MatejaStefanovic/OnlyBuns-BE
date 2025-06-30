@@ -56,6 +56,14 @@ dependencies {
     ///RateLimiter
     implementation 'io.github.resilience4j:resilience4j-spring-boot3:2.0.2'
 
+    // Spring Boot Actuator for application monitoring
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+
+    // Micrometer Prometheus registry for Prometheus integration
+    implementation 'io.micrometer:micrometer-registry-prometheus'
+    implementation 'io.micrometer:micrometer-core'
+
+    implementation 'org.springframework.boot:spring-boot-starter-amqp' // RabbitMQ Starter
     configurations {
         all {
             exclude group: 'org.springframework.boot', module: 'spring-boot-starter-logging' // Izbaci Logback zato sto koristimo log4j2

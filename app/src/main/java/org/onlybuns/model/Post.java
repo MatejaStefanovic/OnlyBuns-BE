@@ -17,6 +17,7 @@ public class Post {
     private int id;
     private  String description;
     private LocalDateTime creationDateTime;
+    private boolean suitableForAds = false;
 
     @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "image_id", referencedColumnName = "id")
@@ -42,6 +43,7 @@ public class Post {
     public Post() {
         likesList = new ArrayList<Like>();
         comments = new ArrayList<Comment>();
+        suitableForAds = false;
     }
 
     public Post(int id, String description, LocalDateTime creationDateTime, Image image, Location location) {
@@ -64,6 +66,18 @@ public class Post {
         this.comments = new ArrayList<Comment>(comments);
         this.likesList = new ArrayList<Like>(likesList);
         this.likes = likes;
+    }
+
+    public Post(int id, String description, LocalDateTime creationDateTime, Image image, Location location, List<Comment> comments,List<Like> likesList, int likes, boolean suitableForAds) {
+        this.id = id;
+        this.description = description;
+        this.creationDateTime = creationDateTime;
+        this.location = location;
+        this.image = image;
+        this.comments = new ArrayList<Comment>(comments);
+        this.likesList = new ArrayList<Like>(likesList);
+        this.likes = likes;
+        this.suitableForAds = suitableForAds;
     }
 
     public List<Comment> getComments() {
@@ -134,6 +148,13 @@ public class Post {
     }
     public void setUser(User user) {
         this.user = user;
+    }
+
+    public boolean isSuitableForAds() {
+        return suitableForAds;
+    }
+    public void setSuitableForAds(boolean suitableForAds) {
+        this.suitableForAds = suitableForAds;
     }
 
 }

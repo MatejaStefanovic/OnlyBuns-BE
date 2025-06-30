@@ -1,6 +1,8 @@
 package org.onlybuns.controller;
 
 
+import io.micrometer.core.annotation.Timed;
+import io.micrometer.core.instrument.MeterRegistry;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import jakarta.validation.Valid;
@@ -26,6 +28,7 @@ import java.time.format.DateTimeParseException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import io.micrometer.core.instrument.Timer;
 
 @RestController
 @RequestMapping("/api/post")
@@ -33,10 +36,16 @@ import java.util.Map;
 public class PostController {
 
     private final PostService postService;
+    private final Timer createPostTimer;
 
     @Autowired
-    public PostController(PostService postService) {
+    public PostController(PostService postService, MeterRegistry meterRegistry) {
+
         this.postService = postService;
+        this.createPostTimer = Timer.builder("http_requests_create_post")
+                .description("Time taken to create a new post")
+                .register(meterRegistry);
+
     }
 
 
@@ -55,18 +64,24 @@ public class PostController {
         response.put("message", "Updated");
         return ResponseEntity.ok(response);
     }
+
     @PostMapping(consumes = {"multipart/form-data"})
     public ResponseEntity<Map<String, String>> createPost(@RequestPart("description") String description,
                                                           @RequestPart("image") MultipartFile image,
                                                           @RequestPart("city") String city,
                                                           @RequestPart("country") String country,
                                                           @RequestPart("street") String street,
-                                                          @RequestPart("email") String email
-                           ) throws IOException {
-
-        postService.createPost(new PostCreationDTO(description,image, new Location(country,street,city),email));
-
+                                                          @RequestPart("email") String email) throws IOException {
         Map<String, String> response = new HashMap<>();
+
+        createPostTimer.record(() -> {
+            try {
+                postService.createPost(new PostCreationDTO(description, image, new Location(country, street, city), email, false));
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        });
+
         response.put("message", "Created");
         return ResponseEntity.ok(response);
     }

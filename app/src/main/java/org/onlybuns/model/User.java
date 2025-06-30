@@ -70,12 +70,12 @@ public class User {
     private UserRole role;
 
     private Date lastActivity;
-    private LocalDateTime lastCheckedStatistics;
+    private Date lastCheckedStatistics;
     
     public User() {
     }
 
-    public User(UserRole role, Location location, boolean isActivated, String email, String lastName, String firstName, String password, String username, Integer numberOfFollowing, Integer numberOfPosts, Integer numberOfFollowers, Set<String> followers, Date lastActivity, LocalDateTime lastCheckedStatistics ) {
+    public User(UserRole role, Location location, boolean isActivated, String email, String lastName, String firstName, String password, String username, Integer numberOfFollowing, Integer numberOfPosts, Integer numberOfFollowers, Set<String> followers, Date lastActivity, Date lastCheckedStatistics ) {
         this.role = role;
         this.location = location;
         this.isActivated = isActivated;
@@ -195,11 +195,11 @@ public class User {
         this.lastActivity = lastActivity;
     }
 
-    public LocalDateTime getLastCheckedStatistics() {
+    public Date getLastCheckedStatistics() {
         return lastCheckedStatistics;
     }
 
-    public void setLastCheckedStatistics(LocalDateTime lastCheckedStatistics) {
+    public void setLastCheckedStatistics(Date lastCheckedStatistics) {
         this.lastCheckedStatistics = lastCheckedStatistics;
     }
 }
