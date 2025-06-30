@@ -9,14 +9,20 @@ import org.onlybuns.repository.LikeRepository;
 import org.onlybuns.repository.PostRepository;
 import org.onlybuns.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cglib.core.Local;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.List;
+import java.time.temporal.WeekFields;
+import java.util.*;
 import java.util.stream.Collectors;
+
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 @Service
 public class PostService {
@@ -69,6 +75,8 @@ public class PostService {
         post.setCreationDateTime(LocalDateTime.now());
         User user = userRepository.findByEmail(postCreationDTO.getEmail());
         post.setUser(user);
+        user.setNumberOfPosts(user.getNumberOfPosts()+1);
+        userRepository.save(user);
         if (postCreationDTO.getImage() != null && !postCreationDTO.getImage().isEmpty()) {
             Image image = fileStorageService.storeFile(postCreationDTO.getImage());
             fileStorageService.getImageBase64ForImage(image);
@@ -78,16 +86,143 @@ public class PostService {
         return postRepository.save(post);
     }
 
+    public int getPostStatisticsYearly() {
+        List<Object[]> dailyPostCounts =    postRepository.getDailyPostCounts(LocalDateTime.now().minusYears(1), LocalDateTime.now());
+        Map<String, Long> yearlyCounts = new HashMap<>();
+
+        for (Object[] row : dailyPostCounts) {
+            Date d = (Date) row[0];
+            LocalDate date = ((java.sql.Date) d).toLocalDate();
+            long postCount = (long) row[1];
+            String year = String.valueOf(date.getYear());
+            yearlyCounts.put(year, yearlyCounts.getOrDefault(year, 0L) + postCount);
+        }
+
+        long sum = 0;
+        for (long count : yearlyCounts.values()) {
+            sum += count;
+        }
+        int totalMonths = yearlyCounts.size();
+        System.out.println("YEARLY: " + yearlyCounts);
+        return (int) Math.round((double) sum / totalMonths);
+    }
+
+
+
+    public int getPostStatisticsMonthly() {
+        List<Object[]> dailyPostCounts =    postRepository.getDailyPostCounts(LocalDateTime.now().minusMonths(3), LocalDateTime.now());
+        Map<String, Long> monthlyCounts = new HashMap<>();
+
+        for (Object[] row : dailyPostCounts) {
+            Date d = (Date) row[0];
+            LocalDate date = ((java.sql.Date) d).toLocalDate();
+            long postCount = (long) row[1];
+            int year = date.getYear();
+            int month = date.getMonthValue();
+            String yearMonth = year + "-" + String.format("%02d", month); //"GODINA-MJESEC"
+            monthlyCounts.put(yearMonth, monthlyCounts.getOrDefault(yearMonth, 0L) + postCount);
+        }
+        //dodavanje sedmica u kojim nema postova
+        LocalDate startDate = LocalDate.now().minusMonths(3);
+        LocalDate endDate = LocalDate.now();
+        LocalDate current = startDate;
+        while (!current.isAfter(endDate)) {
+            int year = current.getYear();
+            int month = current.getMonthValue();
+            String yearMonth = year + "-" + String.format("%02d", month);
+            monthlyCounts.putIfAbsent(yearMonth, 0L);
+            current = current.plusMonths(1);
+        }
+
+        System.out.println("DDDMONTH: " + monthlyCounts);
+        long sum = 0;
+        for (long count : monthlyCounts.values()) {
+            sum += count;
+        }
+        int totalMonths = monthlyCounts.size();
+        System.out.println("DDDMONTH: " + monthlyCounts);
+        return (int) Math.round((double) sum / totalMonths);
+    }
+
+    public int getPostStatisticsWeekly() {
+        List<Object[]> dailyPostCounts =    postRepository.getDailyPostCounts(LocalDateTime.now().minusMonths(3), LocalDateTime.now());
+        Map<String, Long> weeklyCounts = new HashMap<>();
+
+        for (Object[] row : dailyPostCounts) {
+            Date d = (Date) row[0];
+            LocalDate date = ((java.sql.Date) d).toLocalDate();
+           // LocalDate date = dateTime.toLocalDate();
+            long postCount = (long) row[1];
+            int year = date.getYear();
+            int week = date.get(WeekFields.of(Locale.getDefault()).weekOfYear());
+            String yearWeek = year + "-" + String.format("%02d", week); //"GODINA-SEDMICA"
+            weeklyCounts.put(yearWeek, weeklyCounts.getOrDefault(yearWeek, 0L) + postCount);
+        }
+ //dodavanje sedmica u kojim nema postova
+        LocalDate startDate = LocalDate.now().minusMonths(3);
+        LocalDate endDate = LocalDate.now();
+        LocalDate current = startDate;
+        while (!current.isAfter(endDate)) {
+            int year = current.getYear();
+            int week = current.get(WeekFields.of(Locale.getDefault()).weekOfYear());
+            String yearWeek = year + "-" + String.format("%02d", week);
+            weeklyCounts.putIfAbsent(yearWeek, 0L);
+            current = current.plusWeeks(1);
+        }
+
+        System.out.println("R: " + weeklyCounts);
+        long sum = 0;
+        for (long count : weeklyCounts.values()) {
+            sum += count;
+        }
+        int totalWeeks = weeklyCounts.size();
+        System.out.println("R: " + weeklyCounts);
+        return (int) Math.round((double) sum / totalWeeks);
+    }
+
+    /*public int getPostStatisticsWeekly(){
+        List<Object[]> weeklyPostCounts = postRepository.findWeeklyPostCounts(LocalDateTime.now().minusMonths(3), LocalDateTime.now());
+        int  sum=0;
+        int count=weeklyPostCounts.size();
+        for (Object[] row : weeklyPostCounts) {
+            String date = (String) row[0];
+            long postCount = (int) row[1];
+            sum += postCount;
+        }
+        return (int)sum/count;
+    }*/
+
     public List<Post> getAllPosts() throws IOException {
         return postRepository.findAll();
     }
 
-    public List<Post> getPostsFromUser(String email) throws IOException {
-        User user = userRepository.findByEmail(email);
-        return postRepository.findAllByUser(user);
+    public List<Post> getAllPostsFollowed(String loggedUsername) {
+
+        List<Post> allPosts = postRepository.findAll();
+        List<Post> filteredPosts = new ArrayList<>();
+
+
+        for (Post post : allPosts) {
+            boolean isFollower = post.getUser().getFollowers().stream()
+                    .anyMatch(follower -> follower.equals(loggedUsername));
+            if (isFollower) {
+                filteredPosts.add(post);
+            }
+        }
+        return filteredPosts;
     }
 
-   public void deletePost(long postId){
+
+    public List<Post> getPostsFromUser(String email) throws IOException {
+        User user = userRepository.findByEmail(email); // Retrieve the user by email
+        return postRepository.findAll()
+                .stream()
+                .filter(post -> post.getUser().getId() == user.getId())
+                .collect(Collectors.toList());
+    }
+
+
+    public void deletePost(long postId){
        Post post = postRepository.findById(postId)
                .orElseThrow(() -> new IllegalArgumentException("Post not found for ID: " + postId));
 
@@ -227,6 +362,19 @@ public class PostService {
 
         // Ako korisnik ima više od 60 komentara u poslednjih sat vremena, vraćamo false
         return recentComments.size() < 15;
+    }
+
+    @Transactional
+    public List<Post> getTopFivePostsLastWeek() {
+        LocalDateTime sevenDaysAgo = LocalDateTime.now().minusDays(7);
+        Pageable pageable = PageRequest.of(0, 5); // Page 0, size 5
+        return postRepository.findTopFivePostsLastWeek(sevenDaysAgo, pageable);
+    }
+
+    @Transactional
+    public List<Post> getTopTenPostsAllTime() {
+        Pageable pageable = PageRequest.of(0, 10); // Page 0, size 10
+        return postRepository.findTopTenPostsAllTime(pageable);
     }
 
 

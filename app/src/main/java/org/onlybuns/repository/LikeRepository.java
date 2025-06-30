@@ -8,16 +8,13 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 public interface LikeRepository  extends JpaRepository<Like, Long> {
     @Modifying
     @Query("DELETE FROM Like l WHERE l.user.id = :userId AND l.post.id = :postId")
     void deleteByUserAndPost(@Param("userId") long userId, @Param("postId") long postId);
-
-
-
-
 
 
 }

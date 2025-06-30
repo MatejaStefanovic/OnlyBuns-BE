@@ -95,8 +95,40 @@ public class PostController {
     @GetMapping("/userPosts")
     public ResponseEntity<List<Post>> getPostsFromUser(@RequestParam String email) throws IOException {
         // Retrieve posts using the user's email
+
         List<Post> posts = postService.getPostsFromUser(email);
         return ResponseEntity.ok(posts);
     }
+    @GetMapping("/trending/lastWeek")
+    public ResponseEntity<List<Post>> getTop5PostsLast7Days() {
+        List<Post> posts = postService.getTopFivePostsLastWeek();
+        return ResponseEntity.ok(posts);
+    }
 
+    @GetMapping("/weekly")
+    public ResponseEntity<Integer> getWeeklyStatistic() throws IOException {
+
+        int stat = postService.getPostStatisticsWeekly();
+        return ResponseEntity.ok(stat);
+    }
+
+    @GetMapping("/monthly")
+    public ResponseEntity<Integer> getMonthlyStatistic() throws IOException {
+
+        int stat = postService.getPostStatisticsMonthly();
+        return ResponseEntity.ok(stat);
+    }
+
+    @GetMapping("/yearly")
+    public ResponseEntity<Integer> getYearlyStatistic() throws IOException {
+
+        int stat = postService.getPostStatisticsYearly();
+        return ResponseEntity.ok(stat);
+    }
+
+    @GetMapping("/trending/allTime")
+    public ResponseEntity<List<Post>>  getTop10PostsAllTime() {
+        List<Post> posts = postService.getTopTenPostsAllTime();
+        return ResponseEntity.ok(posts);
+    }
 }

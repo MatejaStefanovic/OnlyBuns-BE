@@ -32,6 +32,7 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.cors(Customizer.withDefaults())
                 .csrf(csrf -> csrf.disable())
+                .sessionManagement(session -> session.disable())
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/actuator/prometheus").permitAll()
                         .requestMatchers("/api/user/register").permitAll()
@@ -39,8 +40,22 @@ public class SecurityConfig {
                         .requestMatchers("/api/user/login").permitAll()
                         .requestMatchers("/api/posts/all").permitAll()
                         .requestMatchers("/api/advertisiment/posts/markForAds/**").permitAll()
+                        .requestMatchers("/api/post/trending/lastWeek").permitAll()
+                        .requestMatchers("/api/post/trending/allTime").permitAll()
+                        .requestMatchers("/api/posts/allFollowing").permitAll()
+                        .requestMatchers("/api/post/weekly").permitAll()
+                        .requestMatchers("/api/post/monthly").permitAll()
+                        .requestMatchers("/api/post/yearly").permitAll()
+                        .requestMatchers("/api/mess/**").permitAll()
+                        .requestMatchers("/api/comment/weekly").permitAll()
+                        .requestMatchers("/api/comment/monthly").permitAll()
+                        .requestMatchers("/api/comment/yearly").permitAll()
+                        .requestMatchers("/api/admin/users").permitAll()
                         .requestMatchers("/api/post/userPosts").permitAll()
                         .requestMatchers("/api/users/findUser").permitAll()
+                        .requestMatchers("/api/users/analytics").permitAll()
+                        .requestMatchers("/api/users/following").permitAll()
+                        .requestMatchers("/socket/**").permitAll()
                         .requestMatchers("/api/user/register", "/api/user/activate", "/api/user/login").permitAll()
                         .requestMatchers("/api/messages").permitAll()
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-resources/**", "/webjars/**", "/swagger-ui.html").permitAll()
@@ -67,3 +82,4 @@ public class SecurityConfig {
         };
     }
 }
+

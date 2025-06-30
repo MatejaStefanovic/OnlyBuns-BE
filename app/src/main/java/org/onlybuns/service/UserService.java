@@ -32,7 +32,12 @@ public class UserService {
         this.authenticationService = authenticationService;
         this.emailService = emailService;
     }
-
+    public long count(){
+        return userRepository.count();
+    }
+    public long countByNumberOfPostsGreaterThan(int number){
+           return userRepository.countByNumberOfPostsGreaterThan(0);
+    }
     public List<User> findAll() {
         return userRepository.findAllByRole(UserRole.NORMAL);
     }
@@ -55,7 +60,7 @@ public class UserService {
         a++;
         int number = user2.getNumberOfFollowers() + 1;
         user2.setNumberOfFollowers(number);
-        user2.getFollowers().add(user1);
+        user2.getFollowers().add(user1.getUsername());
         user1.setNumberOfFollowing(user1.getNumberOfFollowing() + 1);
         System.out.println("Rate limit  counter: " + a);
         userRepository.save(user1);
@@ -84,9 +89,25 @@ public class UserService {
 
         int number = user2.getNumberOfFollowers()-1;
         user2.setNumberOfFollowers(number);
-        user2.getFollowers().remove(user1);
+        user2.getFollowers().remove(user1.getUsername());
         user1.setNumberOfFollowing(user1.getNumberOfFollowing()-1);
         userRepository.save(user1);
         return userRepository.save(user2);
+    }
+
+    @Scheduled(cron = "0 0 0 L * ?")
+   // @Scheduled(cron = "0 */10 * * * ?")
+    @Transactional
+    public void deleteInactiveAccounts() {
+        System.out.println("Pokretanje  brisanja neaktivnih naloga.");
+        List<User> inactiveUsers = userRepository.findInactiveUsers();
+
+        if (!inactiveUsers.isEmpty()) {
+            inactiveUsers.forEach(user -> System.out.println("Brisanje neaktivnog korisnika: "+ user.getUsername()));
+            userRepository.deleteAll(inactiveUsers);
+            System.out.println("Završeno brisanje neaktivnih naloga "+ inactiveUsers.size());
+        } else {
+            System.out.println("Nema neaktivnih naloga.");
+        }
     }
 }
