@@ -50,6 +50,8 @@ dependencies {
     // Image compression
     implementation 'net.coobird:thumbnailator:0.4.8'
 
+    //WebSocket
+    implementation 'org.springframework.boot:spring-boot-starter-websocket'
 
     ///RateLimiter
     implementation 'io.github.resilience4j:resilience4j-spring-boot3:2.0.2'

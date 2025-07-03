@@ -32,14 +32,14 @@ public class PostServicePessimisticLockTest {
 
         executor.submit(() -> {
             System.out.println("Thread 1 start");
-            postService.addLike(46, "Jelena", 1); // Ova će zaključati post i spavati
+            postService.addLike(52, "Jelena", 1); // Ova će zaključati post i spavati
         });
 
         Future<?> future2 = executor.submit(() -> {
             try {
                 Thread.sleep(150); // Dovoljno da se prvi zaključa
                 System.out.println("Thread 2 start");
-                postService.addLike(46, "mima", 1); // Ova treba da čeka i može da baci exception
+                postService.addLike(52, "mima", 1); // Ova treba da čeka i može da baci exception
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
             }

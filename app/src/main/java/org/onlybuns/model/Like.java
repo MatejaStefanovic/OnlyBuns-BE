@@ -25,8 +25,8 @@ public class Like {
 
     private LocalDateTime creationDateTime;
 
-  // @Version
-   //private Integer version=0;
+     @Version
+     private Integer version=0;
      public Like(){}
 
     public Like(User user, Post post, LocalDateTime creationDateTime) {
@@ -67,11 +67,11 @@ public class Like {
         this.creationDateTime = creationDateTime;
     }
 
-   /* public Integer getVersion() {
+    public Integer getVersion() {
         return version;
     }
 
     public void setVersion(Integer version) {
         this.version = version;
-    }*/
+    }
 }

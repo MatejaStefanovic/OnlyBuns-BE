@@ -41,7 +41,7 @@ public class Post {
     private int likes = 0;
 
     @Version
-    private Integer version=0;
+    private Integer version;
 
 
     @JsonIgnoreProperties({"post"}) // da ne ide u beskonačnu petlju

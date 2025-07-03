@@ -1,5 +1,6 @@
 package org.onlybuns.security;
 
+import com.google.common.hash.BloomFilter;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import org.apache.logging.log4j.LogManager;
@@ -8,6 +9,7 @@ import org.onlybuns.exceptions.UserRegistration.*;
 import org.onlybuns.exceptions.DoesNotExist.UsernameAlreadyExistsException;
 import org.onlybuns.model.User;
 import org.onlybuns.repository.UserRepository;
+import org.onlybuns.service.BloomFilterService;
 import org.onlybuns.service.EmailService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -21,6 +23,13 @@ import java.util.Date;
 public class AuthenticationService {
 
     private static final Logger logger = LogManager.getLogger(AuthenticationService.class);
+
+    private final BloomFilter<String> usernameBloomFilter;
+
+    @Autowired
+    public AuthenticationService(BloomFilterService bloomFilterService) {
+        this.usernameBloomFilter = bloomFilterService.getUsernameBloomFilter();
+    }
 
     @Autowired
     private UserRepository userRepository;
@@ -63,8 +72,11 @@ public class AuthenticationService {
 
 
     public void registerUser(User user){
-        if (userRepository.existsByUsername(user.getUsername())) {
-            throw new UsernameAlreadyExistsException("Username is already taken");
+        if (usernameBloomFilter.mightContain(user.getUsername())) {
+            // U slucaju da se desio false positive!
+            if (userRepository.existsByUsername(user.getUsername())) {
+                throw new UsernameAlreadyExistsException("Username is already taken");
+            }
         }
         if (userRepository.existsByEmail(user.getEmail())) {
             throw new EmailAlreadyExistsException("Email is already registered");
@@ -73,7 +85,7 @@ public class AuthenticationService {
         String hashedPassword = encodePassword(user.getPassword());
         user.setPassword(hashedPassword);
         userRepository.save(user);
-
+        usernameBloomFilter.put(user.getUsername());
     }
 
     public String encodePassword(String password){

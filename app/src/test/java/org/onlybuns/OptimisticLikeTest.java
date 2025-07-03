@@ -26,12 +26,12 @@ public class OptimisticLikeTest {
     public void testOptimisticLockingOnAddLike() {
         ExecutorService executor = Executors.newFixedThreadPool(2);
 
-        Future<?> future1 = executor.submit(() -> postService.addLike(49, "mima", 1));
+        Future<?> future1 = executor.submit(() -> postService.addLike(52, "mima", 1));
 
         Future<?> future2 = executor.submit(() -> {
             try {
-                Thread.sleep(100); // pusti prvi da zaključa
-                postService.addLike(49, "Jelena", 1);
+                Thread.sleep(5000); // pusti prvi da zaključa
+                postService.addLike(52, "Jelena", 1);
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
             }

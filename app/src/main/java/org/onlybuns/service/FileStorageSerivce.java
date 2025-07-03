@@ -56,5 +56,24 @@ public class FileStorageSerivce {
         }
     }
 
+    public Image editFile(MultipartFile newFile, Image oldImage) {
+        // 1. Obriši stari fajl (ako postoji)
+        if (oldImage != null && oldImage.getRelativePath() != null) {
+            deleteFile(oldImage.getRelativePath());
+            imageRepository.delete(oldImage); // opcionalno: ako koristiš cascading, možeš izostaviti
+        }
+
+        // 2. Sačuvaj novi fajl
+        return storeFile(newFile);
+    }
+
+    public void deleteFile(String fileName) {
+        try {
+            Path filePath = fileStorageLocation.resolve(fileName).normalize();
+            Files.deleteIfExists(filePath);
+        } catch (IOException ex) {
+            throw new RuntimeException("Could not delete file: " + fileName, ex);
+        }
+    }
 
 }

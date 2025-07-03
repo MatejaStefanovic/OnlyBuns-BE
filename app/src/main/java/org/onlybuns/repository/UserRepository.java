@@ -21,4 +21,8 @@ public interface UserRepository extends JpaRepository<User, Long> {
     User findByUsername(String username);
 
     List<User> findAllByRole(UserRole role);
+
+    @Query("SELECT u FROM User u WHERE u.isActivated = false")
+    List<User> findInactiveUsers();
+    long countByNumberOfPostsGreaterThan(int number);
 }

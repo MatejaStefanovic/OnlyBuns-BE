@@ -53,22 +53,16 @@ public class User {
     @JsonProperty("isActivated")
     private boolean isActivated;
 
-    @ManyToMany
-    @JoinTable(
-            name = "user_followers",
-            joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "follower_id")
-    )
-    private Set<User> followers = new HashSet<>();
-
-    @ManyToMany(mappedBy = "followers")
-    private Set<User> following = new HashSet<>();
+    @ElementCollection
+    @CollectionTable(name = "user_followers", joinColumns = @JoinColumn(name = "user_id"))
+    @Column(name = "follower_username")
+    private Set<String> followers = new HashSet<>();
 
     @Version
     private Integer version=0;
 
     @NotNull
-    @ManyToOne(cascade = CascadeType.PERSIST)
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "location_id")
     private Location location;
 
@@ -81,7 +75,7 @@ public class User {
     public User() {
     }
 
-    public User(UserRole role, Location location, boolean isActivated, String email, String lastName, String firstName, String password, String username, Integer numberOfFollowing, Integer numberOfPosts, Integer numberOfFollowers, Set<User> followers, Date lastActivity, Date lastCheckedStatistics ) {
+    public User(UserRole role, Location location, boolean isActivated, String email, String lastName, String firstName, String password, String username, Integer numberOfFollowing, Integer numberOfPosts, Integer numberOfFollowers, Set<String> followers, Date lastActivity, Date lastCheckedStatistics ) {
         this.role = role;
         this.location = location;
         this.isActivated = isActivated;
@@ -98,11 +92,11 @@ public class User {
         this.lastCheckedStatistics = lastCheckedStatistics;
     }
 
-    public Set<User> getFollowers() {
+    public Set<String> getFollowers() {
         return followers;
     }
 
-    public void setFollowers(Set<User> followers) {
+    public void setFollowers(Set<String> followers) {
         this.followers = followers;
     }
 
