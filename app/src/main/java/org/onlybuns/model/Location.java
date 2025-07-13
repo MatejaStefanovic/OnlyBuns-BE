@@ -24,7 +24,6 @@ public class Location {
         return id;
     }
 
-
     public String getCountry() {
         return country;
     }

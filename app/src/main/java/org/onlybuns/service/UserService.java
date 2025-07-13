@@ -26,6 +26,7 @@ public class UserService {
     private final AuthenticationService authenticationService;
     private final EmailService emailService;
     private int a = 0;
+    
 
     public UserService(UserRepository userRepository,AuthenticationService authenticationService, EmailService emailService) {
         this.userRepository = userRepository;
@@ -44,7 +45,6 @@ public class UserService {
 
     public User findByUsername(String username) { return userRepository.findByUsername(username); }
 
-    
     @Transactional
     @RateLimiter(name = "followLimiter", fallbackMethod = "followFallback")
     public User follow(String usernameFollower, String usernameFollowing) {
@@ -62,6 +62,7 @@ public class UserService {
         user2.setNumberOfFollowers(number);
         user2.getFollowers().add(user1.getUsername());
         user1.setNumberOfFollowing(user1.getNumberOfFollowing() + 1);
+        user1.getFollowing().add(user2.getUsername());
         System.out.println("Rate limit  counter: " + a);
         userRepository.save(user1);
         return userRepository.save(user2);
@@ -73,6 +74,14 @@ public class UserService {
         System.out.println("Rate limit triggered for: " + usernameFollower);
         throw new IllegalStateException("You have reached your following limit per minute.", rnp);
 
+    }
+
+    public void updateUser(String email, User updatedUser) {
+        LOG.info("Updating user with email: {}", email);
+        
+        authenticationService.updateUser(email, updatedUser);
+       
+        LOG.info("User updated successfully");
     }
 
     @Transactional
@@ -91,6 +100,7 @@ public class UserService {
         user2.setNumberOfFollowers(number);
         user2.getFollowers().remove(user1.getUsername());
         user1.setNumberOfFollowing(user1.getNumberOfFollowing()-1);
+        user1.getFollowing().remove(user2.getUsername());
         userRepository.save(user1);
         return userRepository.save(user2);
     }
