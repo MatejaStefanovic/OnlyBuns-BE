@@ -43,7 +43,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/advertisiment/posts/markForAds/**").permitAll()
                         .requestMatchers("/api/post/trending/lastWeek").permitAll()
                         .requestMatchers("/api/post/trending/allTime").permitAll()
-                        .requestMatchers("/api/posts/allFollowing").permitAll()
+                        .requestMatchers("/api/posts/allFollowing/**").permitAll()
                         .requestMatchers("/api/post/weekly").permitAll()
                         .requestMatchers("/api/post/monthly").permitAll()
                         .requestMatchers("/api/post/yearly").permitAll()
