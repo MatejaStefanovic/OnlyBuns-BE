@@ -50,6 +50,12 @@ dependencies {
     // Image compression
     implementation 'net.coobird:thumbnailator:0.4.8'
 
+    ///Cache
+    implementation 'org.ehcache:ehcache'
+    implementation 'javax.cache:cache-api' // Potrebno za logovanje dogadjaja
+    implementation 'org.springframework.boot:spring-boot-starter-cache'
+
+
     //WebSocket
     implementation 'org.springframework.boot:spring-boot-starter-websocket'
 
