@@ -1,6 +1,7 @@
 package org.onlybuns.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
@@ -23,8 +24,8 @@ public class Post {
     @JoinColumn(name = "image_id", referencedColumnName = "id")
     private Image image;
 
-    @ManyToOne(cascade = CascadeType.PERSIST)
-    @JoinColumn(name = "location_id")
+    @ManyToOne
+    @JoinColumn(name = "location_id", nullable = false)
     private Location location;
 
     @ManyToOne
@@ -34,14 +35,21 @@ public class Post {
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Comment> comments;
 
-    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Like> likesList;
+    /*@OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Like> likesList;*/
 
-    private int likes;
+    private int likes = 0;
 
+    @Version
+    private Integer version;
+
+
+    @JsonIgnoreProperties({"post"}) // da ne ide u beskonačnu petlju
+    @OneToMany(mappedBy = "post", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private List<PostLikeUser> likesList;
 
     public Post() {
-        likesList = new ArrayList<Like>();
+        //likesList = new ArrayList<Like>();
         comments = new ArrayList<Comment>();
         suitableForAds = false;
     }
@@ -53,8 +61,8 @@ public class Post {
         this.location = location;
         this.image = image;
         this.comments = new ArrayList<Comment>();
-        this.likesList = new ArrayList<Like>();
-        this.likes = 0;
+       // this.likesList = new ArrayList<Like>();
+       // this.likes = 0;
     }
 
     public Post(int id, String description, LocalDateTime creationDateTime, Image image, Location location, List<Comment> comments,List<Like> likesList, int likes) {
@@ -64,8 +72,8 @@ public class Post {
         this.location = location;
         this.image = image;
         this.comments = new ArrayList<Comment>(comments);
-        this.likesList = new ArrayList<Like>(likesList);
-        this.likes = likes;
+      //  this.likesList = new ArrayList<PostLikeUser>(likesList);
+      //  this.likes = likes;
     }
 
     public Post(int id, String description, LocalDateTime creationDateTime, Image image, Location location, List<Comment> comments,List<Like> likesList, int likes, boolean suitableForAds) {
@@ -75,8 +83,8 @@ public class Post {
         this.location = location;
         this.image = image;
         this.comments = new ArrayList<Comment>(comments);
-        this.likesList = new ArrayList<Like>(likesList);
-        this.likes = likes;
+       // this.likesList = new ArrayList<PostLikeUser>(likesList);
+       // this.likes = likes;
         this.suitableForAds = suitableForAds;
     }
 
@@ -88,11 +96,11 @@ public class Post {
         this.comments = comments;
     }
 
-    public List<Like> getLikesList() {
+    public List<PostLikeUser> getLikesList() {
         return likesList;
     }
 
-    public void setLikesList(List<Like> likesList) {
+    public void setLikesList(List<PostLikeUser> likesList) {
         this.likesList = likesList;
     }
 

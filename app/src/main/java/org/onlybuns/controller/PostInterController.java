@@ -8,6 +8,7 @@ import org.onlybuns.DTOs.PostCreationDTO;
 import org.onlybuns.exceptions.UserRegistration.UnauthorizedUserException;
 import org.onlybuns.model.Location;
 import org.onlybuns.model.Post;
+import org.onlybuns.model.PostLikeUser;
 import org.onlybuns.model.User;
 import org.onlybuns.service.PostService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,13 +39,13 @@ public class PostInterController {
     }
 
 
-   /* @Transactional*/
+
     @PostMapping("/{postId}/like")
     @Operation(summary = "Add a like to a post")
-    public ResponseEntity<Post> addLike(@PathVariable int postId, @RequestParam String username,  @RequestParam int flag) {
+    public ResponseEntity<Integer> addLike(@PathVariable int postId, @RequestParam String username, @RequestParam int flag) {
         try {
-            Post updatedPost = postService.addLike(postId, username, flag);
-            return new ResponseEntity<>(updatedPost, HttpStatus.OK);
+            Integer flagg = postService.addLike(postId, username, flag);
+            return new ResponseEntity<>(flagg, HttpStatus.OK);
         } catch (UnauthorizedUserException e) {
             return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
         } catch (Exception e) {

@@ -1,5 +1,6 @@
 package org.onlybuns.service;
 
+import jakarta.transaction.Transactional;
 import org.onlybuns.config.FileStorageProperties;
 import org.onlybuns.model.Image;
 import org.onlybuns.repository.ImageRepository;
@@ -31,9 +32,12 @@ public class FileStorageSerivce {
             throw new RuntimeException("Could not create the directory where the uploaded files will be stored.", ex);
         }
     }
+
+    @Transactional
     public String getImageBase64ForImage(Image image) throws IOException {
         return image.setImageBase64(fileStorageLocation.toString());
     }
+    @Transactional
     public Image storeFile(MultipartFile file) {
         String fileName = null;
         try {
@@ -52,5 +56,24 @@ public class FileStorageSerivce {
         }
     }
 
+    public Image editFile(MultipartFile newFile, Image oldImage) {
+        // 1. Obriši stari fajl (ako postoji)
+        if (oldImage != null && oldImage.getRelativePath() != null) {
+            deleteFile(oldImage.getRelativePath());
+            imageRepository.delete(oldImage); // opcionalno: ako koristiš cascading, možeš izostaviti
+        }
+
+        // 2. Sačuvaj novi fajl
+        return storeFile(newFile);
+    }
+
+    public void deleteFile(String fileName) {
+        try {
+            Path filePath = fileStorageLocation.resolve(fileName).normalize();
+            Files.deleteIfExists(filePath);
+        } catch (IOException ex) {
+            throw new RuntimeException("Could not delete file: " + fileName, ex);
+        }
+    }
 
 }
