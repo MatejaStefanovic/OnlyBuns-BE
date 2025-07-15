@@ -152,4 +152,10 @@ public class PostController {
         List<Post> posts = postService.getTopTenPostsAllTime();
         return ResponseEntity.ok(posts);
     }
+
+    @GetMapping("/trending/users/lastWeek")
+    public ResponseEntity<List<Object[]>> getTop10UsersLastWeek() {
+        List<Object[]> users = postService.getTopTenUsersThatLikedMost();
+        return ResponseEntity.ok(users);
+    }
 }

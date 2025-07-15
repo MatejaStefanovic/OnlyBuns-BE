@@ -8,12 +8,13 @@ import org.apache.logging.log4j.Logger;
 import org.onlybuns.exceptions.UserRegistration.*;
 import org.onlybuns.exceptions.DoesNotExist.UsernameAlreadyExistsException;
 import org.onlybuns.model.User;
+import org.onlybuns.model.Location;
 import org.onlybuns.repository.UserRepository;
 import org.onlybuns.service.BloomFilterService;
 import org.onlybuns.service.EmailService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.util.Date;
@@ -70,7 +71,6 @@ public class AuthenticationService {
 
     }
 
-
     public void registerUser(User user){
         if (usernameBloomFilter.mightContain(user.getUsername())) {
             // U slucaju da se desio false positive!
@@ -86,6 +86,58 @@ public class AuthenticationService {
         user.setPassword(hashedPassword);
         userRepository.save(user);
         usernameBloomFilter.put(user.getUsername());
+    }
+
+    @Transactional
+    public void updateUser(String email, User updatedUser) {
+        User existingUser = userRepository.findByEmail(email);
+        if (existingUser == null) {
+            System.out.println("ERROR: User not found!");
+            return;
+        }
+        
+        System.out.println("👤 Existing user found: " + existingUser.getEmail());
+        System.out.println("📍 Existing user location: " + existingUser.getLocation());
+    
+
+        // Check if username is being changed and if new username already exists
+        if (!existingUser.getUsername().equals(updatedUser.getUsername()) && 
+            usernameBloomFilter.mightContain(updatedUser.getUsername())) {
+            if (userRepository.existsByUsername(updatedUser.getUsername())) {
+                throw new UsernameAlreadyExistsException("Username is already taken");
+            }
+        }
+        
+        // Update fields
+        String oldUsername = existingUser.getUsername();
+        existingUser.setUsername(updatedUser.getUsername());
+        existingUser.setFirstName(updatedUser.getFirstName());
+        existingUser.setLastName(updatedUser.getLastName());
+
+    
+        if (updatedUser.getLocation() != null) {
+            if (existingUser.getLocation() != null) {
+                // Update existing location
+                existingUser.getLocation().setCity(updatedUser.getLocation().getCity());
+                existingUser.getLocation().setCountry(updatedUser.getLocation().getCountry());
+                existingUser.getLocation().setStreet(updatedUser.getLocation().getStreet());
+                // Add other location fields as needed
+            } else {
+                // Create new location if user didn't have one
+                existingUser.setLocation(updatedUser.getLocation());
+            }
+        }
+        // Only update password if a new one is provided
+        if (updatedUser.getPassword() != null && !updatedUser.getPassword().isEmpty()) {
+            String hashedPassword = encodePassword(updatedUser.getPassword());
+            existingUser.setPassword(hashedPassword);
+        }
+        
+        // Update bloom filter if username changed
+        if (!oldUsername.equals(updatedUser.getUsername())) {
+            usernameBloomFilter.put(updatedUser.getUsername());
+        }
+        
     }
 
     public String encodePassword(String password){

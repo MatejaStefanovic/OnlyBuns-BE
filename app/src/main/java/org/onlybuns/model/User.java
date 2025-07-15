@@ -58,6 +58,11 @@ public class User {
     @Column(name = "follower_username")
     private Set<String> followers = new HashSet<>();
 
+    @ElementCollection
+    @CollectionTable(name = "user_following", joinColumns = @JoinColumn(name = "user_id"))
+    @Column(name = "following_username")
+    private Set<String> following = new HashSet<>();
+ 
     @Version
     private Integer version=0;
 
@@ -75,7 +80,7 @@ public class User {
     public User() {
     }
 
-    public User(UserRole role, Location location, boolean isActivated, String email, String lastName, String firstName, String password, String username, Integer numberOfFollowing, Integer numberOfPosts, Integer numberOfFollowers, Set<String> followers, Date lastActivity, Date lastCheckedStatistics ) {
+    public User(UserRole role, Location location, boolean isActivated, String email, String lastName, String firstName, String password, String username, Integer numberOfFollowing, Integer numberOfPosts, Integer numberOfFollowers, Set<String> followers,Set<String> following, Date lastActivity, Date lastCheckedStatistics ) {
         this.role = role;
         this.location = location;
         this.isActivated = isActivated;
@@ -88,6 +93,7 @@ public class User {
         this.numberOfPosts = numberOfPosts;
         this.numberOfFollowers = numberOfFollowers;
         this.followers = followers;
+        this.following = following;
         this.lastActivity = lastActivity;
         this.lastCheckedStatistics = lastCheckedStatistics;
     }
@@ -98,6 +104,14 @@ public class User {
 
     public void setFollowers(Set<String> followers) {
         this.followers = followers;
+    }
+
+    public Set<String> getFollowing() {
+        return following;
+    }
+
+    public void setFollowing(Set<String> following) {
+        this.following = following;
     }
 
     public Integer getVersion() {

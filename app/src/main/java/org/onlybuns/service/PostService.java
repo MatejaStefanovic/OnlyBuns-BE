@@ -461,6 +461,12 @@ public class PostService {
         Pageable pageable = PageRequest.of(0, 10); // Page 0, size 10
         return postRepository.findTopTenPostsAllTime(pageable);
     }
-
+    
+    @Transactional
+    public List<Object[]> getTopTenUsersThatLikedMost() {
+        LocalDateTime sevenDaysAgo = LocalDateTime.now().minusDays(7);
+        Pageable pageable = PageRequest.of(0, 10); // Page 0, size 10
+        return likeRepository.findUsersWithMostLikesLastWeek(sevenDaysAgo, pageable);
+    }
 
 }

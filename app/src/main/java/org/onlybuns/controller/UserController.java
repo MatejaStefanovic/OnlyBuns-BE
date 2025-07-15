@@ -94,4 +94,30 @@ public class UserController {
         return new ResponseEntity<>(followings, HttpStatus.OK);
     }
 
+
+    @GetMapping("/followers")
+    public ResponseEntity<List<String>> getAllFollowersForUser(@RequestParam("username") String username){
+        User user = userService.findByUsername(username);
+        List<User> users = userService.findAll();
+        List<String> followings = new ArrayList<>();
+        users.remove(user);
+        for (User u : users){
+            boolean isFollowing = u.getFollowing().stream()
+                    .anyMatch(following -> following.equals(user.getUsername()));
+            if (isFollowing) {
+                followings.add(u.getUsername());
+            }
+           /* if( u.getFollowers().contains(user.getUsername())){
+                followings.add(u.getUsername());
+            }*/
+        }
+        return new ResponseEntity<>(followings, HttpStatus.OK);
+    }
+
+
+    @PutMapping("/update/{email}")
+    public ResponseEntity<User> updateUser(@PathVariable String email, @RequestBody User user) {
+        userService.updateUser(email, user);
+        return ResponseEntity.ok().build();
+    }
 }
