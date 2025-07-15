@@ -4,10 +4,7 @@ import jakarta.transaction.Transactional;
 import org.onlybuns.DTOs.PostCreationDTO;
 import org.onlybuns.component.MessageRabbitSender;
 import org.onlybuns.model.*;
-import org.onlybuns.repository.CommentRepository;
-import org.onlybuns.repository.LikeRepository;
-import org.onlybuns.repository.PostRepository;
-import org.onlybuns.repository.UserRepository;
+import org.onlybuns.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cglib.core.Local;
 import org.springframework.stereotype.Service;
@@ -25,6 +22,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
 @Service
+
 public class PostService {
 
     private final PostRepository postRepository;
@@ -33,16 +31,19 @@ public class PostService {
     private final LikeRepository likeRepository;
     private final CommentRepository commentRepository;
     private final MessageRabbitSender messageRabbitSender;
+    private final PostLikeUserRepository postLikeUserRepository;
 
     @Autowired
-    public PostService(PostRepository postRepository, UserRepository userRepository, FileStorageSerivce fileStorageService, LikeRepository likeRepository, CommentRepository commentRepository, MessageRabbitSender messageRabbitSender) {
+    public PostService(PostRepository postRepository, UserRepository userRepository, FileStorageSerivce fileStorageService, LikeRepository likeRepository, CommentRepository commentRepository, MessageRabbitSender messageRabbitSender, PostLikeUserRepository postLikeUserRepository) {
         this.postRepository = postRepository;
         this.userRepository = userRepository;
         this.fileStorageService = fileStorageService;
         this.likeRepository = likeRepository;
         this.commentRepository = commentRepository;
         this.messageRabbitSender = messageRabbitSender;
+        this.postLikeUserRepository = postLikeUserRepository;
     }
+
     public Post updatePost(Long postId, PostCreationDTO postDTO) throws IOException {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new IllegalArgumentException("Post not found for ID: " + postId));
@@ -51,13 +52,14 @@ public class PostService {
         post.setLocation(postDTO.getLocation());
 
         if (postDTO.getImage() != null && !postDTO.getImage().isEmpty()) {
-            Image updatedImage = fileStorageService.storeFile(postDTO.getImage());
+            Image updatedImage = fileStorageService.editFile(postDTO.getImage(), post.getImage());
             fileStorageService.getImageBase64ForImage(updatedImage);
             post.setImage(updatedImage);
         }
 
         return postRepository.save(post);
     }
+
 
     public Post updateSuitable(Long postId, boolean suitable) throws IOException {
         Post post = postRepository.findById(postId)
@@ -67,6 +69,7 @@ public class PostService {
         messageRabbitSender.sendMessage(post.getDescription(),post.getCreationDateTime().toString(), post.getUser().getUsername());
         return postRepository.save(post);
     }
+
 
     public Post createPost(PostCreationDTO postCreationDTO) throws IOException {
         Post post = new Post();
@@ -215,10 +218,11 @@ public class PostService {
 
     public List<Post> getPostsFromUser(String email) throws IOException {
         User user = userRepository.findByEmail(email); // Retrieve the user by email
-        return postRepository.findAll()
+        List<Post> posts = postRepository.findAll()
                 .stream()
                 .filter(post -> post.getUser().getId() == user.getId())
                 .collect(Collectors.toList());
+        return posts;
     }
 
 
@@ -273,10 +277,17 @@ public class PostService {
         return post;
     }*/
 
-    @Transactional
+   /* @Transactional
     public Post addLike(long postId, String username, int flag) {
-        Post post = postRepository.findById(postId)
+        Post post = postRepository.findByIdForUpdate(postId)
                 .orElseThrow(() -> new IllegalArgumentException("Post not found for ID: " + postId));
+
+        // Simuliraj spavanje ili dugo trajanje obrade
+        try {
+            Thread.sleep(5000);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
 
         if (post.getUser() == null) {
             throw new IllegalStateException("Post does not have a user assigned.");
@@ -300,6 +311,7 @@ public class PostService {
 
         if (!alreadyLiked) {
 
+
             post.setLikes(post.getLikes() + 1);
             Like like = new Like(user, post, LocalDateTime.now());
             post.getLikesList().add(like);
@@ -313,13 +325,86 @@ public class PostService {
 
 
         return postRepository.save(post);
-    }
+    }*/
 
+    @Transactional
+    public Integer addLike(long postId, String username, int flag) {
+
+
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new IllegalArgumentException("Post not found for ID: " + postId));
+
+        // Simuliraj spavanje ili dugo trajanje obrade
+        try {
+            Thread.sleep(5000);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+
+
+        // Provera da li korisnik već lajkuje post
+        boolean alreadyLiked = postLikeUserRepository.findAll().stream()
+                .anyMatch(like ->
+                        like.getPost().getId()==postId &&
+                                like.getUsername().equals(username)
+                );
+
+        User user = userRepository.findByUsername(username);
+        if (user == null) {
+            throw new IllegalArgumentException("User not found for username: " + username);
+        }
+
+        if (alreadyLiked) {
+            post.setLikes(post.getLikes()-1);
+            postRepository.saveAndFlush(post);
+
+            postLikeUserRepository.deleteByPostIdAndUsername(postId, username);
+            postLikeUserRepository.flush();// brišemo iz vezne tabele
+            likeRepository.deleteByUserAndPost(user.getId(), post.getId());
+            return 0;
+
+        } else {
+
+            post.setLikes(post.getLikes()+1);
+            postRepository.saveAndFlush(post);
+
+            Like like = new Like(user, post, LocalDateTime.now());
+            like.setPost(post);
+            likeRepository.saveAndFlush(like); // bitno!
+
+            //likeRepository.save(like);
+            //likeRepository.flush();
+
+            // Dodajemo i u veznu tabelu
+            PostLikeUser plu = new PostLikeUser();
+            plu.setPost(post);
+            plu.setLike(like);
+            plu.setUsername(user.getUsername());
+            plu.setUsername(username); // ili `user.getUsername()` ako je `username` višak
+            postLikeUserRepository.save(plu);
+            return 1;
+
+        }
+
+
+
+
+
+
+    }
 
 
     public Post addComment(long postId, String username, String description) {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new IllegalArgumentException("Post not found"));
+
+
+        try {
+            Thread.sleep(500);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+
 
         User user = userRepository.findByUsername(username);
         if (user == null) {
