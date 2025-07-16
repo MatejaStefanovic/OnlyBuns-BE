@@ -52,7 +52,7 @@ public class PostService {
         post.setLocation(postDTO.getLocation());
 
         if (postDTO.getImage() != null && !postDTO.getImage().isEmpty()) {
-            Image updatedImage = fileStorageService.editFile(postDTO.getImage(), post.getImage());
+            Image updatedImage = fileStorageService.storeFile(postDTO.getImage());
             fileStorageService.getImageBase64ForImage(updatedImage);
             post.setImage(updatedImage);
         }
