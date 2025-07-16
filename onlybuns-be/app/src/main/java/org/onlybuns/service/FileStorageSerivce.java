@@ -39,8 +39,8 @@ public class FileStorageSerivce {
     }
 
 
-    // --- Nova metoda za dohvaćanje slike iz baze i keširanje ---
-    @Cacheable(value = "image", key = "#id")
+    /*// --- Nova metoda za dohvaćanje slike iz baze i keširanje ---
+    @Cacheable(value = "imageID", key = "#id")
     public Image getImageById(Long id) { // Koristi Long ako je ID tipa Long u bazi
         System.out.println("Dohvaćam sliku iz baze podataka: " + id);
         // Simuliraj kašnjenje da vidiš efekat keširanja
@@ -51,11 +51,11 @@ public class FileStorageSerivce {
         }
         return imageRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Image not found with id " + id));
-    }
+    }*/
 
     @Transactional
-    @Cacheable(value = "imageBase64", key = "#image.id")
-    public String getImageBase64ForImage(Image image) throws IOException {
+    @Cacheable(value = "image", key = "#image.id")
+    public String getImage(Image image) throws IOException {
         return image.setImageBase64(fileStorageLocation.toString());
     }
 
