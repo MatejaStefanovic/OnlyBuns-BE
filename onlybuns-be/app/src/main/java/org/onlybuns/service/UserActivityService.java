@@ -41,7 +41,7 @@ public class UserActivityService {
     }
 
 
-    @Scheduled(cron = "0 * * * * ?")
+    //@Scheduled(cron = "0 * * * * ?")
     public void checkIfUserIsNotActiveMoreThat7Day() throws IOException {
 
 

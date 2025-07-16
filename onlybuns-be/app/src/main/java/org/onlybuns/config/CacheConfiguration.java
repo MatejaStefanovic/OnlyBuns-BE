@@ -37,10 +37,22 @@ public class CacheConfiguration {
     @Bean
     public RedisCacheManagerBuilderCustomizer redisCacheManagerBuilderCustomizer() {
         return (builder) -> builder
-                .withCacheConfiguration("image", // defualtna vrednost prefiksa kljuceva u bazi je "ime_kesa::"
-                        RedisCacheConfiguration.defaultCacheConfig() // konfiguacija koju menjamo
-                                .entryTtl(Duration.ofSeconds(15)) // TTL je moguce definisati u sekundama, minutima, satima,...
-                                .prefixCacheNameWith("cache:") // moze biti izmenjena statickom vrednoscu
+                .withCacheConfiguration("image",
+                        RedisCacheConfiguration.defaultCacheConfig()
+                                .entryTtl(Duration.ofSeconds(15))
+                                .prefixCacheNameWith("cache:")
+                )
+                .withCacheConfiguration("imageBase64",
+                        RedisCacheConfiguration.defaultCacheConfig()
+                                .entryTtl(Duration.ofHours(1))
+                                .computePrefixWith(cacheName -> "image::")
                 );
+               /* .withCacheConfiguration("location",
+                        RedisCacheConfiguration.defaultCacheConfig()
+                                .entryTtl(Duration.ofMinutes(30))
+                                .prefixCacheNameWith("geo:")
+                );*/
     }
+
+
 }

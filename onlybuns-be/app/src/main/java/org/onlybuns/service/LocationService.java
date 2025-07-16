@@ -4,6 +4,7 @@ import org.onlybuns.DTOs.LocationDTO;
 import org.onlybuns.model.Location;
 import org.onlybuns.repository.LocationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -13,45 +14,35 @@ import java.util.Optional;
 public class LocationService {
 
     @Autowired
-    private LocationRepository cacheRepository;
+    private LocationRepository locationRepository;
 
     @Autowired
     private OpenCageService openCageService;
 
+    // Glavna metoda koja će se keširati
+    @Cacheable(value = "location", key = "#lat.toPlainString() + '_' + #lng.toPlainString()")
     public Location getLocationInfo(BigDecimal lat, BigDecimal lng) {
 
-        // 1. Napravi ključ za keš
-        String key = String.format("%.4f_%.4f", lat, lng);
+        // Ako vrednost NIJE u Redis kešu, tek onda se izvršava ovaj blok:
+        System.out.println("Pozivam OpenCage API jer nije bilo u Redis kešu...");
 
-        // 2. Pogledaj u keš
-        Optional<Location> cached = cacheRepository.findByCoordinateKey(key);
-
-        if (cached.isPresent()) {
-            System.out.println("Našao lokaciju u kešu!");
-            Location cache = cached.get();
-            return cache;
-        }
-
-        // 3. Nema u kešu - pozovi API
-        System.out.println("Pozivam OpenCage API...");
         LocationDTO locationData = openCageService.getLocationFromCoordinates(lat, lng);
 
-        // 4. Sačuvaj u keš
-        Location newCache = new Location();
-        newCache.setCoordinateKey(key);
-        newCache.setCity(locationData.getCity());
-        newCache.setCountry(locationData.getCountry());
-        newCache.setStreet(locationData.getStreet());
-        newCache.setLatitude(lat);
-        newCache.setLongitude(lng);
+        Location newLocation = new Location();
+        // Važno: Ključ za bazu kreiraš i ovde, isti kao i za keš, da bi se lokacije ispravno čuvale
+        newLocation.setCoordinateKey(String.format("%.4f_%.4f", lat, lng));
+        newLocation.setCity(locationData.getCity());
+        newLocation.setCountry(locationData.getCountry());
+        newLocation.setStreet(locationData.getStreet());
+        newLocation.setLatitude(lat);
+        newLocation.setLongitude(lng);
 
-        cacheRepository.save(newCache);
-        System.out.println("Sačuvao u keš!");
+        // Ovu liniju OSTAVLJAŠ, jer je ona odgovorna za *čuvanje* lokacije u bazu
+        // To se dešava SAMO ako lokacija nije pronađena u Redis kešu
+        locationRepository.save(newLocation);
+        System.out.println("Lokacija preuzeta sa OpenCage API-ja, sačuvana u bazi i stavljena u Redis keš.");
 
-        return newCache;
+        return newLocation;
     }
-
-
-
 
 }

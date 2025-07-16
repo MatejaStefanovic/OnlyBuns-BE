@@ -26,6 +26,7 @@ public class Image implements Serializable {
     private String imageBase64;
 
 
+
     public int getId() {
         return id;
     }
