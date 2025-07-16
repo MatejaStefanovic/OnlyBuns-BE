@@ -35,6 +35,8 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.disable())
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/actuator/prometheus").permitAll()
+                        .requestMatchers("/call-backend-manual-lb").permitAll()
+                        .requestMatchers("/hello-from-backend").permitAll()
                         .requestMatchers("/api/user/register").permitAll()
                         .requestMatchers("/api/user/activate").permitAll()
                         .requestMatchers("/api/user/login").permitAll()
@@ -81,7 +83,7 @@ public class SecurityConfig {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/**")
-                        .allowedOrigins("http://localhost:3000", "http://localhost:3001", "http://localhost:3002",  "http://localhost:6379")
+                        .allowedOrigins("http://localhost:3000", "http://localhost:3001", "http://localhost:3002",  "http://localhost:6379","http://localhost:8081","http://localhost:8082","http://localhost:8083","http://localhost:8084")
                         .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                         .allowedHeaders("*")
                         .allowCredentials(true);
