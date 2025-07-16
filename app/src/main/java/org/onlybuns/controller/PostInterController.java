@@ -5,11 +5,13 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import org.hibernate.annotations.Parameter;
 import org.onlybuns.DTOs.PostCreationDTO;
+import org.onlybuns.exceptions.RateLimiter.TooManyRequestsException;
 import org.onlybuns.exceptions.UserRegistration.UnauthorizedUserException;
 import org.onlybuns.model.Location;
 import org.onlybuns.model.Post;
 import org.onlybuns.model.PostLikeUser;
 import org.onlybuns.model.User;
+import org.onlybuns.rateLimiter.RateLimiter;
 import org.onlybuns.service.PostService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -25,6 +27,7 @@ import java.time.format.DateTimeParseException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 @RestController
 @RequestMapping("/api/posts")
@@ -67,6 +70,7 @@ public class PostInterController {
 
     @PostMapping("/{postId}/comment")
     @Operation(summary = "Add a comment to a post")
+    @RateLimiter(maxRequests = 10, timeWindow = 1, unit = TimeUnit.MINUTES)
     public ResponseEntity<Post> addComment(
             @PathVariable int postId,
             @RequestParam String username,
@@ -78,7 +82,7 @@ public class PostInterController {
         } catch (IllegalArgumentException e) {
             // Ako post ili korisnik nisu pronađeni
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
-        } catch (IllegalStateException e) {
+        } catch (TooManyRequestsException e) {
             // Ako korisnik premaši limit za komentare
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
         } catch (UnauthorizedUserException e) {

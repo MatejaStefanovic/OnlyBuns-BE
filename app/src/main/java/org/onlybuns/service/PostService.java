@@ -399,11 +399,11 @@ public class PostService {
                 .orElseThrow(() -> new IllegalArgumentException("Post not found"));
 
 
-        try {
+       /* try {
             Thread.sleep(500);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-        }
+        }*/
 
 
         User user = userRepository.findByUsername(username);
@@ -411,9 +411,9 @@ public class PostService {
             throw new IllegalArgumentException("User not found");
         }
 
-        if (!checkIfUserCanComment(user)) {
-            throw new IllegalStateException("User has exceeded the comment limit for the last hour.");
-        }
+        /*if (!checkIfUserCanComment(user)) {
+            throw new IllegalStateException("User has exceeded the comment limit for the last hour. <3");
+        }*/
 
         // Kreiranje i dodavanje komentara
         Comment comment = new Comment();
