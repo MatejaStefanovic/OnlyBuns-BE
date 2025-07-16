@@ -99,5 +99,29 @@ public class TokenProvider {
         }
     }
 
+    public Long getUserIdFromToken(String token) {
+        try {
+            String email = getSubjectFromJWT(token);
+            if (email == null || email.isEmpty()) {
+                System.out.println("No subject (email) found in JWT token.");
+                return null;
+            }
+
+            User user = userRepository.findByEmail(email);
+            if (user != null) {
+                return user.getId();
+            } else {
+                System.out.println("User not found in database for email: " + email);
+                return null;
+            }
+        } catch (JwtException e) {
+            System.out.println("Invalid JWT token during user ID extraction: " + e.getMessage());
+            return null;
+        } catch (Exception e) {
+            System.out.println("An unexpected error occurred while extracting user ID: " + e.getMessage());
+            return null;
+        }
+    }
+
 
 }
