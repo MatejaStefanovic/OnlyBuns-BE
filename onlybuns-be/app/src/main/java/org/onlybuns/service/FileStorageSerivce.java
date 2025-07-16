@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.UUID;
 
 @Service
 public class FileStorageSerivce {
@@ -62,10 +63,16 @@ public class FileStorageSerivce {
     @Transactional
     @CachePut(value = "image", key = "#result.id")
     public Image storeFile(MultipartFile file) {
-        String fileName = null;
+        String fileName = file.getOriginalFilename();
+
+        String fileExtension = "";
+        int dotIndex = fileName.lastIndexOf('.');
+        if (dotIndex > 0) {
+            fileExtension = fileName.substring(dotIndex);
+        }
+        // Generiši jedinstveno ime fajla
+        fileName = UUID.randomUUID().toString() + fileExtension; // Ovde je izmena!
         try {
-            // Normalize file name
-            fileName = file.getOriginalFilename();
 
             // Copy file to the target location
             Path targetLocation = this.fileStorageLocation.resolve(fileName);
