@@ -54,8 +54,8 @@ public class FileStorageSerivce {
     }*/
 
     @Transactional
-    @Cacheable(value = "image", key = "#image.id")
-    public String getImage(Image image) throws IOException {
+    @Cacheable(value = "imageBase64", key = "#image.id")
+    public String getImage (Image image) throws IOException {
         return image.setImageBase64(fileStorageLocation.toString());
     }
 

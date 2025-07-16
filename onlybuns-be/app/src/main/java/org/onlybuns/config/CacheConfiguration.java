@@ -40,7 +40,12 @@ public class CacheConfiguration {
                 .withCacheConfiguration("image", // defualtna vrednost prefiksa kljuceva u bazi je "ime_kesa::"
                         RedisCacheConfiguration.defaultCacheConfig() // konfiguacija koju menjamo
                                 .entryTtl(Duration.ofSeconds(15)) // TTL je moguce definisati u sekundama, minutima, satima,...
-                                .prefixCacheNameWith("cache:") // moze biti izmenjena statickom vrednoscu
+                                .prefixCacheNameWith("cache:")
+                ).withCacheConfiguration("imageBase64", // The cache name used in @Cacheable
+                RedisCacheConfiguration.defaultCacheConfig()
+                        .entryTtl(Duration.ofHours(1))
+
+                        .computePrefixWith(cacheName -> "image::") // Defines a fixed prefix
                 );
     }
 }
