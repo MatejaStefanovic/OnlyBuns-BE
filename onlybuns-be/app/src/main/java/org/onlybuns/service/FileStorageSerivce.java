@@ -5,6 +5,9 @@ import org.onlybuns.config.FileStorageProperties;
 import org.onlybuns.model.Image;
 import org.onlybuns.repository.ImageRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -22,6 +25,8 @@ public class FileStorageSerivce {
     @Autowired
     private ImageRepository imageRepository;
 
+
+
     @Autowired
     public FileStorageSerivce(FileStorageProperties fileStorageProperties) {
         this.fileStorageLocation = Paths.get(fileStorageProperties.getUploadDir())
@@ -33,11 +38,29 @@ public class FileStorageSerivce {
         }
     }
 
+
+    /*// --- Nova metoda za dohvaćanje slike iz baze i keširanje ---
+    @Cacheable(value = "imageID", key = "#id")
+    public Image getImageById(Long id) { // Koristi Long ako je ID tipa Long u bazi
+        System.out.println("Dohvaćam sliku iz baze podataka: " + id);
+        // Simuliraj kašnjenje da vidiš efekat keširanja
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+        return imageRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Image not found with id " + id));
+    }*/
+
     @Transactional
-    public String getImageBase64ForImage(Image image) throws IOException {
+    @Cacheable(value = "image", key = "#image.id")
+    public String getImage(Image image) throws IOException {
         return image.setImageBase64(fileStorageLocation.toString());
     }
+
     @Transactional
+    @CachePut(value = "image", key = "#result.id")
     public Image storeFile(MultipartFile file) {
         String fileName = null;
         try {
@@ -56,17 +79,8 @@ public class FileStorageSerivce {
         }
     }
 
-    public Image editFile(MultipartFile newFile, Image oldImage) {
-        // 1. Obriši stari fajl (ako postoji)
-        if (oldImage != null && oldImage.getRelativePath() != null) {
-            deleteFile(oldImage.getRelativePath());
-            imageRepository.delete(oldImage); // opcionalno: ako koristiš cascading, možeš izostaviti
-        }
 
-        // 2. Sačuvaj novi fajl
-        return storeFile(newFile);
-    }
-
+/*
     public void deleteFile(String fileName) {
         try {
             Path filePath = fileStorageLocation.resolve(fileName).normalize();
@@ -74,6 +88,19 @@ public class FileStorageSerivce {
         } catch (IOException ex) {
             throw new RuntimeException("Could not delete file: " + fileName, ex);
         }
+    }*/
+// --- Metoda za brisanje fajla i izbacivanje iz keša ---
+@CacheEvict(value = "image", key = "#id") // Briše iz keša kada se metoda izvrši
+@Transactional
+public void deleteFile(String fileName, Long id) { // Dodat ID za brisanje iz keša
+    try {
+        Path filePath = fileStorageLocation.resolve(fileName).normalize();
+        Files.deleteIfExists(filePath);
+        imageRepository.deleteById(id); // Obriši i iz baze
+        System.out.println("Obrisao fajl i izbacio sliku sa ID: " + id + " iz keša.");
+    } catch (IOException ex) {
+        throw new RuntimeException("Could not delete file: " + fileName, ex);
     }
+}
 
 }

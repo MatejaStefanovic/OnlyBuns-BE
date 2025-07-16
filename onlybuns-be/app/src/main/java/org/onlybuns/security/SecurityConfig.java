@@ -55,6 +55,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/admin/users").permitAll()
                         .requestMatchers("/api/post/userPosts").permitAll()
                         .requestMatchers("/api/post/**").permitAll()
+                        .requestMatchers("/api/post").permitAll()
                         .requestMatchers("/api/post-like-users/**").permitAll()
                         .requestMatchers("/api/users/findUser").permitAll()
                         .requestMatchers("/api/users/analytics").permitAll()
@@ -80,7 +81,7 @@ public class SecurityConfig {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/**")
-                        .allowedOrigins("http://localhost:3000", "http://localhost:3001", "http://localhost:3002")
+                        .allowedOrigins("http://localhost:3000", "http://localhost:3001", "http://localhost:3002",  "http://localhost:6379")
                         .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                         .allowedHeaders("*")
                         .allowCredentials(true);

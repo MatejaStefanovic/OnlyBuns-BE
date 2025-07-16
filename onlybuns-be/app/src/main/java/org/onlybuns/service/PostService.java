@@ -52,8 +52,8 @@ public class PostService {
         post.setLocation(postDTO.getLocation());
 
         if (postDTO.getImage() != null && !postDTO.getImage().isEmpty()) {
-            Image updatedImage = fileStorageService.editFile(postDTO.getImage(), post.getImage());
-            fileStorageService.getImageBase64ForImage(updatedImage);
+            Image updatedImage = fileStorageService.storeFile(postDTO.getImage());
+            fileStorageService.getImage(updatedImage);
             post.setImage(updatedImage);
         }
 
@@ -82,7 +82,8 @@ public class PostService {
         userRepository.save(user);
         if (postCreationDTO.getImage() != null && !postCreationDTO.getImage().isEmpty()) {
             Image image = fileStorageService.storeFile(postCreationDTO.getImage());
-            fileStorageService.getImageBase64ForImage(image);
+       fileStorageService.getImage(image);
+
             post.setImage(image);
         }
 

@@ -58,6 +58,10 @@ dependencies {
 
     // Spring Boot Actuator for application monitoring
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    implementation 'com.fasterxml.jackson.core:jackson-databind'
+    //Cache
+    implementation 'org.springframework.boot:spring-boot-starter-cache'
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 
     // Micrometer Prometheus registry for Prometheus integration
     implementation 'io.micrometer:micrometer-registry-prometheus'
