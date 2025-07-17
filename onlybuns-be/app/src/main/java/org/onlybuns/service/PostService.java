@@ -336,12 +336,12 @@ public class PostService {
                 .orElseThrow(() -> new IllegalArgumentException("Post not found for ID: " + postId));
 
         // Simuliraj spavanje ili dugo trajanje obrade
-        try {
+        /*try {
             Thread.sleep(5000);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }
-
+*/
 
         // Provera da li korisnik već lajkuje post
         boolean alreadyLiked = postLikeUserRepository.findAll().stream()
@@ -399,12 +399,12 @@ public class PostService {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new IllegalArgumentException("Post not found"));
 
-
+/*
         try {
             Thread.sleep(500);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-        }
+        }*/
 
 
         User user = userRepository.findByUsername(username);

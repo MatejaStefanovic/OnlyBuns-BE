@@ -8,10 +8,11 @@
 
 plugins {
     // Apply the application plugin to add support for building a CLI application in Java.
-    id 'org.springframework.boot' version '3.3.5' // Use the latest version available
-    id 'io.spring.dependency-management' version '1.1.6'
     id 'java'
     id 'application'
+    id 'org.springframework.boot' version '3.3.5' // Use the latest version available
+  id 'io.spring.dependency-management' version '1.1.6'
+
 }
 group = 'org.example'
 repositories {
@@ -21,7 +22,8 @@ repositories {
 
 dependencies {
     // This dependency is used by the application.
-    implementation libs.guava
+    //implementation libs.guava
+    implementation 'com.google.guava:guava:33.0.0-jre'
     developmentOnly 'org.springframework.boot:spring-boot-devtools' // Za hot reloading (meni ne radi :d) 
     implementation 'org.springframework.boot:spring-boot-starter' // Core Spring Boot Starter
     implementation 'org.springframework.boot:spring-boot-starter-web' // For web applications
@@ -31,6 +33,11 @@ dependencies {
     implementation 'org.postgresql:postgresql:42.7.4' // Postgres
     implementation 'org.springframework.boot:spring-boot-starter-mail' //Mail Service
     runtimeOnly 'com.h2database:h2' // H2 Database for in-memory testing
+
+    //Spring Retry za LoadBalancer
+    //implementation 'org.springframework.retry:spring-retry'
+    //implementation 'org.springframework.boot:spring-boot-starter-aop'
+    implementation 'jakarta.annotation:jakarta.annotation-api:2.1.1'
 
     implementation('org.springframework.boot:spring-boot-starter-log4j2') //Base log4j2
 
@@ -49,6 +56,7 @@ dependencies {
 
     // Image compression
     implementation 'net.coobird:thumbnailator:0.4.8'
+
 
     //WebSocket
     implementation 'org.springframework.boot:spring-boot-starter-websocket'
@@ -74,7 +82,6 @@ dependencies {
         }
     }
 }
-
 
 testing {
     suites {
