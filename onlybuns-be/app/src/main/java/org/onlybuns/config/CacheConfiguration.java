@@ -47,5 +47,12 @@ public class CacheConfiguration {
 
                         .computePrefixWith(cacheName -> "image::") // Defines a fixed prefix
                 );
+               /* .withCacheConfiguration("location",
+                        RedisCacheConfiguration.defaultCacheConfig()
+                                .entryTtl(Duration.ofMinutes(30))
+                                .prefixCacheNameWith("geo:")
+                );*/
     }
+
+
 }

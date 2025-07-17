@@ -82,7 +82,7 @@ public class PostService {
         userRepository.save(user);
         if (postCreationDTO.getImage() != null && !postCreationDTO.getImage().isEmpty()) {
             Image image = fileStorageService.storeFile(postCreationDTO.getImage());
-       fileStorageService.getImage(image);
+            fileStorageService.getImage(image);
 
             post.setImage(image);
         }
@@ -412,9 +412,7 @@ public class PostService {
             throw new IllegalArgumentException("User not found");
         }
 
-        if (!checkIfUserCanComment(user)) {
-            throw new IllegalStateException("User has exceeded the comment limit for the last hour.");
-        }
+
 
         // Kreiranje i dodavanje komentara
         Comment comment = new Comment();

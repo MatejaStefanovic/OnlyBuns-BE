@@ -3,12 +3,13 @@ package org.onlybuns.model;
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "location")
-public class Location {
+public class Location implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
