@@ -18,9 +18,11 @@ import java.util.List;
 public class GroupChatService {
 
     private final GroupChatRepository groupChatRepository ;
+    private final GroupMemberRepository groupMemberRepository ;
 
-    public GroupChatService (GroupChatRepository groupChatRepository){
+    public GroupChatService (GroupChatRepository groupChatRepository, GroupMemberRepository groupMemberRepository){
         this.groupChatRepository = groupChatRepository;
+        this.groupMemberRepository = groupMemberRepository;
     }
 
     public GroupChat newGroup(GroupChat group, List<String> users){
@@ -48,11 +50,29 @@ public class GroupChatService {
         return group;
     }
 
-    public GroupChat addMember(long groupId, String username){
+    public GroupChat addMember(long groupId, String username, String adminUsername){
         GroupChat group = groupChatRepository.findByIdWithMembers(groupId).orElse(null);
-        GroupMember gm = new GroupMember(username);
-        group.getMembers().add(gm);
-        GroupChat g= groupChatRepository.save(group);
+        if(group.getAdmin().equals(adminUsername)) {
+            GroupMember gm = new GroupMember(username);
+            group.getMembers().add(gm);
+            GroupChat g = groupChatRepository.save(group);
+            return g;
+        }else{
+            System.out.println("Admin username " + group.getAdmin() );
+            return null;
+        }
+    }
+    public GroupChat deleteMember(long groupId, String username, String adminUsername){
+        GroupChat group = groupChatRepository.findByIdWithMembers(groupId).orElse(null);
+        if(!group.getAdmin().equals(adminUsername)) {return null;}
+        boolean removed = group.getMembers().removeIf(member -> {
+            if (member.getMemberUsername().equals(username)) {
+                groupMemberRepository.deleteById(member.getId());
+                return true;
+            }
+            return false;
+        });
+        GroupChat g = groupChatRepository.save(group);
         return g;
     }
 }

@@ -94,10 +94,26 @@ public class MessagesInfoController {
     }
 
     @GetMapping("/addMember")
-    public ResponseEntity<GroupChat> addMemberInGroupChat(@RequestParam("username") String username, @RequestParam("groupId") Long groupId){
-        GroupChat group = groupChatService.addMember(groupId, username);
+    public ResponseEntity<GroupChat> addMemberInGroupChat(@RequestParam("username") String username, @RequestParam("groupId") Long groupId, @RequestParam("adminUsername") String adminUsernam){
+        GroupChat group = groupChatService.addMember(groupId, username,adminUsernam);
+        System.out.println("Received group " + group );
+
+        if (group == null) {
+            return ResponseEntity.notFound().build();
+        }
         return ResponseEntity.ok(group);
     }
+
+    @GetMapping("/deleteMember")
+    public ResponseEntity<GroupChat> deleteGroupChatMember (@RequestParam("username") String username, @RequestParam("groupId") Long groupId, @RequestParam("adminUsername") String adminUsername){
+        GroupChat group = groupChatService.deleteMember(groupId, username,adminUsername);
+        System.out.println("Received group " + group );
+        if (group == null) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(group);
+    }
+
     @GetMapping("/getGroupMembers")
     public ResponseEntity<List<String>>getMembers(@RequestParam("groupId") Long groupId){
         GroupChat group = groupChatService.findById(groupId);
