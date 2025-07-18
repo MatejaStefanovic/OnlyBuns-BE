@@ -3,7 +3,7 @@ package org.messagebroker.controller;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
+import org.springframework.web.bind.annotation.CrossOrigin;
 
 import java.nio.charset.StandardCharsets;
 import java.util.*;
@@ -13,6 +13,7 @@ import org.messagebroker.model.*;
 
 @RestController
 @RequestMapping("/messages")
+@CrossOrigin(origins = "http://localhost:3000")
 public class MessageBrokerController {
     private final Map<String, Map<String, List<Message>>> messageQueues = new ConcurrentHashMap<>();
     private final Set<String> connectedApps = ConcurrentHashMap.newKeySet();
@@ -20,19 +21,19 @@ public class MessageBrokerController {
     @PostMapping("/connect")
     public ResponseEntity<String> connect(@RequestParam String appId) {
         if (connectedApps.contains(appId))
-            return ResponseEntity.status(HttpStatus.CONFLICT).body("Error - App already connected: " + appId);
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("Error - App already connected");
         
         connectedApps.add(appId);
-        return ResponseEntity.ok("Connected: " + appId);
+        return ResponseEntity.ok("Connected");
     }
     
     @PostMapping("/disconnect")
     public ResponseEntity<String> disconnect(@RequestParam String appId) {
         if (!connectedApps.contains(appId))
-            return ResponseEntity.status(HttpStatus.CONFLICT).body("Error - app is not connected: " + appId);
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("Error - app is not connected");
         
         connectedApps.remove(appId);
-        return ResponseEntity.ok("Disconnected: " + appId);
+        return ResponseEntity.ok("Disconnected");
     }
     
     @PostMapping
@@ -41,7 +42,7 @@ public class MessageBrokerController {
         String targetAppId = request.getTargetId();
         
         if (!connectedApps.contains(senderAppId))
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error - sender isn't connected: " + senderAppId);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error - sender isn't connected");
         
         if (senderAppId.equals(targetAppId))
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error - cannot send message to the same app");
@@ -64,7 +65,7 @@ public class MessageBrokerController {
 
         if (!connectedApps.contains(targetId)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                        .body(new MessageResponse("Error - recipient is not connected: " + targetId, 
+                        .body(new MessageResponse("Error - recipient is not connected", 
                                                                         Collections.emptyList()));
         }
 
