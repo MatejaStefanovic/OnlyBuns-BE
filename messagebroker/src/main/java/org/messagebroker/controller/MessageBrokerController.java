@@ -3,7 +3,9 @@ package org.messagebroker.controller;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.CrossOrigin;
 
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -11,56 +13,88 @@ import org.messagebroker.model.*;
 
 @RestController
 @RequestMapping("/messages")
+@CrossOrigin(origins = "http://localhost:3000")
 public class MessageBrokerController {
-
     private final Map<String, Map<String, List<Message>>> messageQueues = new ConcurrentHashMap<>();
     private final Set<String> connectedApps = ConcurrentHashMap.newKeySet();
-
+    
     @PostMapping("/connect")
     public ResponseEntity<String> connect(@RequestParam String appId) {
+        if (connectedApps.contains(appId))
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("Error - App already connected");
+        
         connectedApps.add(appId);
-        return ResponseEntity.ok("Connected: " + appId);
+        return ResponseEntity.ok("Connected");
     }
-
+    
     @PostMapping("/disconnect")
     public ResponseEntity<String> disconnect(@RequestParam String appId) {
+        if (!connectedApps.contains(appId))
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("Error - app is not connected");
+        
         connectedApps.remove(appId);
-        return ResponseEntity.ok("Disconnected: " + appId);
+        return ResponseEntity.ok("Disconnected");
     }
-
+    
     @PostMapping
-    public ResponseEntity<Void> postMessage(@RequestBody MessageRequest request) {
-        if (!connectedApps.contains(request.getAppId())) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-        }
+    public ResponseEntity<String> postMessage(@RequestBody MessageRequest request) {
+        String senderAppId = request.getSenderId();
+        String targetAppId = request.getTargetId();
+        
+        if (!connectedApps.contains(senderAppId))
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error - sender isn't connected");
+        
+        if (senderAppId.equals(targetAppId))
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error - cannot send message to the same app");
+        
+        String channelKey = createChannelKey(senderAppId, targetAppId);
+        
         messageQueues
-            .computeIfAbsent(request.getAppId(), k -> new ConcurrentHashMap<>())
+            .computeIfAbsent(channelKey, k -> new ConcurrentHashMap<>())
             .computeIfAbsent(request.getQueueId(), k -> new ArrayList<>())
             .add(request.getMessage());
-        return ResponseEntity.ok().build();
+        
+        return ResponseEntity.ok().body("Success");
     }
-
+    
     @GetMapping
-    public ResponseEntity<List<Message>> getMessages(
-            @RequestParam String appId,
+    public ResponseEntity<MessageResponse> getMessages(
+            @RequestParam String targetId,
+            @RequestParam String senderId,
             @RequestParam String queueId) {
 
-        Map<String, List<Message>> appQueues = messageQueues.get(appId);
-        if (appQueues == null) {
-            return ResponseEntity.ok(Collections.emptyList());
+        if (!connectedApps.contains(targetId)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                        .body(new MessageResponse("Error - recipient is not connected", 
+                                                                        Collections.emptyList()));
         }
 
-        List<Message> queue = appQueues.get(queueId);
+        if (targetId.equals(senderId)) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                        .body(new MessageResponse("Error - cannot retrieve messages from the same app",
+                                                                        Collections.emptyList()));
+        }
+
+        String channelKey = createChannelKey(senderId, targetId);
+        Map<String, List<Message>> channelQueues = messageQueues.get(channelKey);
+
+        if (channelQueues == null) {
+            return ResponseEntity.ok(new MessageResponse("No messages found", Collections.emptyList()));
+        }
+
+        List<Message> queue = channelQueues.get(queueId);
         if (queue == null || queue.isEmpty()) {
-            return ResponseEntity.ok(Collections.emptyList());
+            return ResponseEntity.ok(new MessageResponse("Queue is empty", Collections.emptyList()));
         }
 
-        // Copy messages to return
         List<Message> messagesToReturn = new ArrayList<>(queue);
-
-        // Clear the queue (consume)
         queue.clear();
 
-        return ResponseEntity.ok(messagesToReturn);
+        return ResponseEntity.ok(new MessageResponse("Success", messagesToReturn));
     }
+    
+    private String createChannelKey(String app1, String app2) {
+         return app1 + "->" + app2;
+    }
+
 }
