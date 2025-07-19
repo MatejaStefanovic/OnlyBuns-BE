@@ -74,7 +74,8 @@ dependencies {
     // Micrometer Prometheus registry for Prometheus integration
     implementation 'io.micrometer:micrometer-registry-prometheus'
     implementation 'io.micrometer:micrometer-core'
-
+    // DateTime
+    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.17.2' // Use a compatible version
     implementation 'org.springframework.boot:spring-boot-starter-amqp' // RabbitMQ Starter
     configurations {
         all {

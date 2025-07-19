@@ -51,12 +51,12 @@ public class UserService {
         LOG.info("Follow method invoked for follower: {} and following: {}", usernameFollower, usernameFollowing);
         User user1 = findByUsername(usernameFollower);
         User user2 = userRepository.findByUsername(usernameFollowing);
-       /* try {
+        try {
             Thread.sleep(2000); // Pauza od 100ms
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             LOG.error("Thread interrupted", e);
-        }*/
+        }
         a++;
         int number = user2.getNumberOfFollowers() + 1;
         user2.setNumberOfFollowers(number);

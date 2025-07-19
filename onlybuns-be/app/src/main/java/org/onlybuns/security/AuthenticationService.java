@@ -71,6 +71,7 @@ public class AuthenticationService {
 
     }
 
+    @jakarta.transaction.Transactional
     public void registerUser(User user){
         if (usernameBloomFilter.mightContain(user.getUsername())) {
             // U slucaju da se desio false positive!

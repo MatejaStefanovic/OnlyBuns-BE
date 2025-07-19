@@ -1,6 +1,7 @@
 package org.onlybuns.service;
 
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.transaction.Transactional;
 import org.onlybuns.exceptions.Security.*;
 import org.onlybuns.exceptions.UserRegistration.*;
 import org.onlybuns.model.User;
@@ -11,6 +12,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
+
 
 @Service
 public class UserLoginService {
@@ -37,12 +39,23 @@ public class UserLoginService {
         return jwtToken;
 
     }
+    @Transactional
     public void registerUser(User user) {
         // Call AuthenticationService to register a user without activating
+
         authenticationService.registerUser(user);
 
         String activationUrl = generateActivationUrl(user);
         sendActivationEmail(user.getEmail(), activationUrl);
+
+
+        try {
+            Thread.sleep(5000);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            //LOG.error("Thread interrupted", e);
+        }
+
     }
 
     public void sendActivationEmail(String email, String activationUrl) {

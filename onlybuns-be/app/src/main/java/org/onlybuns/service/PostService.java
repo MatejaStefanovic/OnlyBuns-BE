@@ -6,6 +6,7 @@ import org.onlybuns.component.MessageRabbitSender;
 import org.onlybuns.model.*;
 import org.onlybuns.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cglib.core.Local;
 import org.springframework.stereotype.Service;
 
@@ -336,12 +337,12 @@ public class PostService {
                 .orElseThrow(() -> new IllegalArgumentException("Post not found for ID: " + postId));
 
         // Simuliraj spavanje ili dugo trajanje obrade
-        /*try {
+       /* try {
             Thread.sleep(5000);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-        }
-*/
+        }*/
+
 
         // Provera da li korisnik već lajkuje post
         boolean alreadyLiked = postLikeUserRepository.findAll().stream()
@@ -448,18 +449,21 @@ public class PostService {
         return recentComments.size() < 15;
     }
 
-    @Transactional
+   /* @Transactional
+    @Cacheable
     public List<Post> getTopFivePostsLastWeek() {
         LocalDateTime sevenDaysAgo = LocalDateTime.now().minusDays(7);
         Pageable pageable = PageRequest.of(0, 5); // Page 0, size 5
         return postRepository.findTopFivePostsLastWeek(sevenDaysAgo, pageable);
     }
 
+
     @Transactional
+    @Cacheable
     public List<Post> getTopTenPostsAllTime() {
         Pageable pageable = PageRequest.of(0, 10); // Page 0, size 10
         return postRepository.findTopTenPostsAllTime(pageable);
-    }
+    }*/
     
     @Transactional
     public List<Object[]> getTopTenUsersThatLikedMost() {
@@ -467,5 +471,20 @@ public class PostService {
         Pageable pageable = PageRequest.of(0, 10); // Page 0, size 10
         return likeRepository.findUsersWithMostLikesLastWeek(sevenDaysAgo, pageable);
     }
+    @Transactional
+    @Cacheable(cacheNames = "top5") // koristi konfiguraciju sa prefixom "rank::" i TTL 10 minuta
+    public List<Post> getTopFivePostsLastWeek() {
+        LocalDateTime sevenDaysAgo = LocalDateTime.now().minusDays(7);
+        Pageable pageable = PageRequest.of(0, 5); // Page 0, size 5
+        return postRepository.findTopFivePostsLastWeek(sevenDaysAgo, pageable);
+    }
+
+    @Transactional
+    @Cacheable(cacheNames = "top10") // koristi konfiguraciju sa prefixom "rank::" i TTL 20 minuta
+    public List<Post> getTopTenPostsAllTime() {
+        Pageable pageable = PageRequest.of(0, 10); // Page 0, size 10
+        return postRepository.findTopTenPostsAllTime(pageable);
+    }
+
 
 }

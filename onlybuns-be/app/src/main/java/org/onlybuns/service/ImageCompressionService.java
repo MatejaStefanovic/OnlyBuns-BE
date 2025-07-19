@@ -19,7 +19,7 @@ public class ImageCompressionService {
 
     @Value("${upload.path}")
     private String imageDirPath;
-    @Scheduled(cron = "0 0 0 * * ?") // Pokreće se svakog dana u ponoć
+    //@Scheduled(cron = "0 0 0 * * ?") // Pokreće se svakog dana u ponoć
     //@Scheduled(cron = "0 * * * * ?")
 
     public void compressOldImages() {
