@@ -13,7 +13,7 @@ import org.messagebroker.model.*;
 
 @RestController
 @RequestMapping("/messages")
-@CrossOrigin(origins = "http://localhost:3000")
+@CrossOrigin(origins = "http://localhost:3001")
 public class MessageBrokerController {
     private final Map<String, Map<String, List<Message>>> messageQueues = new ConcurrentHashMap<>();
     private final Set<String> connectedApps = ConcurrentHashMap.newKeySet();
