@@ -39,6 +39,7 @@ public class UserLoginService {
         return jwtToken;
 
     }
+
     @Transactional
     public void registerUser(User user) {
         // Call AuthenticationService to register a user without activating
@@ -47,14 +48,6 @@ public class UserLoginService {
 
         String activationUrl = generateActivationUrl(user);
         sendActivationEmail(user.getEmail(), activationUrl);
-
-
-        try {
-            Thread.sleep(5000);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            //LOG.error("Thread interrupted", e);
-        }
 
     }
 

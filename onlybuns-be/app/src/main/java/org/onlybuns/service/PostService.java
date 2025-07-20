@@ -449,8 +449,8 @@ public class PostService {
         return recentComments.size() < 15;
     }
 
-   /* @Transactional
-    @Cacheable
+    @Transactional
+    @Cacheable(value = "topFivePostsLastWeek")
     public List<Post> getTopFivePostsLastWeek() {
         LocalDateTime sevenDaysAgo = LocalDateTime.now().minusDays(7);
         Pageable pageable = PageRequest.of(0, 5); // Page 0, size 5
@@ -459,31 +459,17 @@ public class PostService {
 
 
     @Transactional
-    @Cacheable
+    @Cacheable(value = "topTenPostsAllTime")
     public List<Post> getTopTenPostsAllTime() {
         Pageable pageable = PageRequest.of(0, 10); // Page 0, size 10
         return postRepository.findTopTenPostsAllTime(pageable);
-    }*/
+    }
     
     @Transactional
     public List<Object[]> getTopTenUsersThatLikedMost() {
         LocalDateTime sevenDaysAgo = LocalDateTime.now().minusDays(7);
         Pageable pageable = PageRequest.of(0, 10); // Page 0, size 10
         return likeRepository.findUsersWithMostLikesLastWeek(sevenDaysAgo, pageable);
-    }
-    @Transactional
-    @Cacheable(cacheNames = "top5") // koristi konfiguraciju sa prefixom "rank::" i TTL 10 minuta
-    public List<Post> getTopFivePostsLastWeek() {
-        LocalDateTime sevenDaysAgo = LocalDateTime.now().minusDays(7);
-        Pageable pageable = PageRequest.of(0, 5); // Page 0, size 5
-        return postRepository.findTopFivePostsLastWeek(sevenDaysAgo, pageable);
-    }
-
-    @Transactional
-    @Cacheable(cacheNames = "top10") // koristi konfiguraciju sa prefixom "rank::" i TTL 20 minuta
-    public List<Post> getTopTenPostsAllTime() {
-        Pageable pageable = PageRequest.of(0, 10); // Page 0, size 10
-        return postRepository.findTopTenPostsAllTime(pageable);
     }
 
 

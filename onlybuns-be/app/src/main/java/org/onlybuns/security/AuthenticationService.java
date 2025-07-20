@@ -71,7 +71,7 @@ public class AuthenticationService {
 
     }
 
-    @jakarta.transaction.Transactional
+    @Transactional
     public void registerUser(User user){
         if (usernameBloomFilter.mightContain(user.getUsername())) {
             // U slucaju da se desio false positive!
@@ -85,8 +85,16 @@ public class AuthenticationService {
 
         String hashedPassword = encodePassword(user.getPassword());
         user.setPassword(hashedPassword);
-        userRepository.save(user);
-        usernameBloomFilter.put(user.getUsername());
+
+        try {
+            userRepository.save(user);
+            usernameBloomFilter.put(user.getUsername());
+            
+            Thread.sleep(100);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            //LOG.error("Thread interrupted", e);
+        }
     }
 
     @Transactional
