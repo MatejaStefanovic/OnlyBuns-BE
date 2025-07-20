@@ -20,7 +20,7 @@ public class ImageCompressionService {
     @Value("${upload.path}")
     private String imageDirPath;
     //@Scheduled(cron = "0 0 0 * * ?") // Pokreće se svakog dana u ponoć
-    //@Scheduled(cron = "0 * * * * ?")
+    @Scheduled(cron = "0 * * * * ?")
 
     public void compressOldImages() {
         File imageDir = new File(imageDirPath);
@@ -48,23 +48,23 @@ public class ImageCompressionService {
 
 
     private boolean isCompressed(File file) {
-        // Proverava da li je fajl već kompresovana verzija (ima "-compressed" u imenu)
+
         if (file.getName().contains("-compressed")) {
-            return true; // Fajl je već kompresovana verzija
+            return true;
         }
 
-        // Ako fajl nije kompresovan, proverava da li postoji kompresovana verzija
+
         String compressedFileName = file.getName().replace(".", "-compressed.");
         File compressedFile = new File(file.getParent(), compressedFileName);
-        return compressedFile.exists(); // Vraća true ako kompresovana verzija postoji
+        return compressedFile.exists();
     }
 
     private void compressImage(File file) throws IOException {
         String compressedFilePath = file.getParent() + File.separator +
                 file.getName().replace(".", "-compressed.");
         Thumbnails.of(file)
-                .size(1024, 1024) // Prilagodite veličinu po potrebi
-                .outputQuality(0.7) // Kvalitet kompresije
+                .size(1024, 1024)
+                .outputQuality(0.7)
                 .toFile(new File(compressedFilePath));
 
         System.out.println("Kompresovana slika: " + compressedFilePath);

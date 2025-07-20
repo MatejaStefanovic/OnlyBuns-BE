@@ -35,10 +35,10 @@ public class RateLimiterAspect {
         MethodSignature signature = (MethodSignature) joinPoint.getSignature();
         RateLimiter rateLimited = signature.getMethod().getAnnotation(RateLimiter.class);
 
-        // --- IZVLAČENJE VREDNOSTI IZ ANOTACIJE ---
+
         long maxRequests = rateLimited.maxRequests();
         long timeWindowMillis = rateLimited.unit().toMillis(rateLimited.timeWindow());
-        // ------------------------------------------
+
 
         String userKey = rateLimited.key();
 
@@ -76,11 +76,11 @@ public class RateLimiterAspect {
             }
         }
 
-        // --- POZIVANJE tryAcquire SA IZVUČENIM VREDNOSTIMA ---
+
         if (!rateLimiter.tryAcquire(userKey, maxRequests, timeWindowMillis)) {
             throw new TooManyRequestsException("Prekoračen broj zahteva. Molimo pokušajte kasnije.");
         }
-        // ----------------------------------------------------
+
 
         return joinPoint.proceed();
     }
